@@ -69,13 +69,7 @@ export class OpenIDLogin extends React.Component {
 
       // Generate PKCE verifier and challenge
       const code_verifier = generateCodeVerifier()
-      // Store verifier keyed by state in sessionStorage
-      try {
-        sessionStorage.setItem(`oidc_code_verifier_${state}`, code_verifier)
-      } catch (e) {
-        // fallback to local storage if sessionStorage not available
-        storage.setItem(`oidc_code_verifier_${state}`, code_verifier)
-      }
+      storage.setItem(`oidc_code_verifier_${state}`, code_verifier)
 
       codeChallengeFromVerifier(code_verifier).then(code_challenge => {
         const authURL = buildOpenIDAuthURL(
@@ -121,12 +115,7 @@ export class OpenIDLogin extends React.Component {
       }
 
       // Retrieve code_verifier
-      let code_verifier = null
-      try {
-        code_verifier = sessionStorage.getItem(`oidc_code_verifier_${values.state}`)
-      } catch (e) {
-        code_verifier = storage.getItem(`oidc_code_verifier_${values.state}`)
-      }
+      let code_verifier = storage.getItem(`oidc_code_verifier_${values.state}`)
 
       if (!code_verifier) {
         this.props.showAlert("danger", "Missing PKCE code_verifier")
