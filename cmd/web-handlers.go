@@ -2246,6 +2246,7 @@ type ExchangeOIDCCodeArgs struct {
 	CodeVerifier string `json:"code_verifier" form:"code_verifier"`
 	RedirectURI  string `json:"redirect_uri" form:"redirect_uri"`
 	State        string `json:"state" form:"state"`
+	Nonce        string `json:"nonce" form:"nonce"`
 }
 
 var errSTSNotInitialized = errors.New("STS API not initialized, please configure STS support")
@@ -2356,6 +2357,14 @@ func (web *webAPIHandlers) ExchangeOIDCCode(r *http.Request, args *ExchangeOIDCC
 	m, err := v.Validate(idt, "")
 	if err != nil {
 		return toJSONError(ctx, err)
+	}
+
+	// Require nonce from client and verify it matches nonce claim in id_token
+	if args.Nonce == "" {
+		return toJSONError(ctx, fmt.Errorf("missing nonce"))
+	}
+	if m["nonce"] != args.Nonce {
+		return toJSONError(ctx, fmt.Errorf("nonce mismatch"))
 	}
 
 	// Extract policy claims and mint STS credentials

@@ -114,9 +114,8 @@ export class OpenIDLogin extends React.Component {
     }
 
     if (values.code) {
-      const nonce = storage.getItem(OPEN_ID_NONCE_KEY)
       const state = storage.getItem(OPEN_ID_STATE_KEY)
-      if (!nonce || nonce !== values.nonce || !state || state !== values.state) {
+      if (!state || state !== values.state) {
         this.props.showAlert("danger", "Invalid auth token")
         return
       }
@@ -134,8 +133,10 @@ export class OpenIDLogin extends React.Component {
         return
       }
 
+      const nonce = storage.getItem(OPEN_ID_NONCE_KEY)
+
       // Exchange code + verifier with backend which will perform token exchange and session creation
-      web.ExchangeCode({ code: values.code, code_verifier, redirect_uri: window.location.href.split('#')[0], state: values.state })
+      web.ExchangeCode({ code: values.code, code_verifier, redirect_uri: window.location.href.split('#')[0], state: values.state, nonce })
         .then(() => {
           storage.removeItem(OPEN_ID_NONCE_KEY)
           storage.removeItem(OPEN_ID_STATE_KEY)
