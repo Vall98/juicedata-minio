@@ -185,6 +185,13 @@ func (args *LoginSTSArgs) ToKeyValue() KeyValueMap {
 	return km
 }
 
+// ToKeyValue implementation for ExchangeOIDCCodeArgs
+// Keep empty to avoid logging sensitive authorization codes/verifiers.
+func (args *ExchangeOIDCCodeArgs) ToKeyValue() KeyValueMap {
+	km := KeyValueMap{}
+	return km
+}
+
 // ToKeyValue implementation for GetBucketPolicyArgs
 func (args *GetBucketPolicyArgs) ToKeyValue() KeyValueMap {
 	km := KeyValueMap{}

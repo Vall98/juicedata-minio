@@ -85,6 +85,17 @@ class Web {
         return res
       })
   }
+  // Exchange authorization code (from PKCE flow) via backend
+  ExchangeCode(args) {
+    return this.makeCall('ExchangeOIDCCode', args)
+      .then(res => {
+        // Backend should return an app token (or equivalent) like LoginSTS
+        if (res && res.token) {
+          storage.setItem('token', `${res.token}`)
+        }
+        return res
+      })
+  }
   ServerInfo() {
     return this.makeCall('ServerInfo')
   }

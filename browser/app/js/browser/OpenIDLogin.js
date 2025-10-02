@@ -24,9 +24,9 @@ import web from "../web"
 import { Redirect } from "react-router-dom"
 import qs from "query-string"
 import { getRandomString } from "../utils"
+import { generateCodeVerifier, codeChallengeFromVerifier } from './utils'
 import storage from "local-storage-fallback"
-import jwtDecode from "jwt-decode"
-import { buildOpenIDAuthURL, OPEN_ID_NONCE_KEY } from './utils'
+import { buildOpenIDAuthURL, OPEN_ID_NONCE_KEY, OPEN_ID_STATE_KEY } from './utils'
 
 export class OpenIDLogin extends React.Component {
   constructor(props) {
@@ -60,18 +60,35 @@ export class OpenIDLogin extends React.Component {
     if (this.state.discoveryDoc && this.state.discoveryDoc.authorization_endpoint) {
       const redirectURI = window.location.href.split("#")[0]
 
-      // Store nonce in localstorage to check again after the redirect
-      const nonce = getRandomString(16)
+      // Store nonce and state in localstorage to check again after the redirect
+      const nonce = getRandomString(32)
       storage.setItem(OPEN_ID_NONCE_KEY, nonce)
 
-      const authURL = buildOpenIDAuthURL(
-        this.state.discoveryDoc.authorization_endpoint,
-        this.state.discoveryDoc.scopes_supported,
-        redirectURI,
-        this.state.clientID,
-        nonce
-      )
-      window.location = authURL
+      const state = getRandomString(32)
+      storage.setItem(OPEN_ID_STATE_KEY, state)
+
+      // Generate PKCE verifier and challenge
+      const code_verifier = generateCodeVerifier()
+      // Store verifier keyed by state in sessionStorage
+      try {
+        sessionStorage.setItem(`oidc_code_verifier_${state}`, code_verifier)
+      } catch (e) {
+        // fallback to local storage if sessionStorage not available
+        storage.setItem(`oidc_code_verifier_${state}`, code_verifier)
+      }
+
+      codeChallengeFromVerifier(code_verifier).then(code_challenge => {
+        const authURL = buildOpenIDAuthURL(
+          this.state.discoveryDoc.authorization_endpoint,
+          this.state.discoveryDoc.scopes_supported,
+          redirectURI,
+          this.state.clientID,
+          nonce,
+          state,
+          { code_challenge }
+        )
+        window.location = authURL
+      })
     }
   }
 
@@ -89,25 +106,49 @@ export class OpenIDLogin extends React.Component {
   }
 
   componentDidMount() {
-    const values = qs.parse(this.props.location.hash)
+    // Parse query params for code (Authorization Code flow)
+    const values = qs.parse(this.props.location.search)
     if (values.error) {
       this.props.showAlert("danger", values.error_description)
       return
     }
 
-    if (values.id_token) {
-      // Check nonce on the token to prevent replay attacks
-      const tokenJSON = jwtDecode(values.id_token)
-      if (storage.getItem(OPEN_ID_NONCE_KEY) !== tokenJSON.nonce) {
+    if (values.code) {
+      const nonce = storage.getItem(OPEN_ID_NONCE_KEY)
+      const state = storage.getItem(OPEN_ID_STATE_KEY)
+      if (!nonce || nonce !== values.nonce || !state || state !== values.state) {
         this.props.showAlert("danger", "Invalid auth token")
         return
       }
 
-      web.LoginSTS({ token: values.id_token }).then(() => {
-        storage.removeItem(OPEN_ID_NONCE_KEY)
-        this.forceUpdate()
+      // Retrieve code_verifier
+      let code_verifier = null
+      try {
+        code_verifier = sessionStorage.getItem(`oidc_code_verifier_${values.state}`)
+      } catch (e) {
+        code_verifier = storage.getItem(`oidc_code_verifier_${values.state}`)
+      }
+
+      if (!code_verifier) {
+        this.props.showAlert("danger", "Missing PKCE code_verifier")
         return
-      })
+      }
+
+      // Exchange code + verifier with backend which will perform token exchange and session creation
+      web.ExchangeCode({ code: values.code, code_verifier, redirect_uri: window.location.href.split('#')[0], state: values.state })
+        .then(() => {
+          storage.removeItem(OPEN_ID_NONCE_KEY)
+          storage.removeItem(OPEN_ID_STATE_KEY)
+          try {
+            sessionStorage.removeItem(`oidc_code_verifier_${values.state}`)
+          } catch (e) {
+            storage.removeItem(`oidc_code_verifier_${values.state}`)
+          }
+          this.forceUpdate()
+        })
+        .catch(err => {
+          this.props.showAlert('danger', err.message || 'Failed to exchange authorization code')
+        })
     }
   }
 

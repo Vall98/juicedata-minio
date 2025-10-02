@@ -2240,6 +2240,14 @@ type LoginSTSArgs struct {
 	Token string `json:"token" form:"token"`
 }
 
+// ExchangeOIDCCodeArgs - args for exchanging authorization code from SPA
+type ExchangeOIDCCodeArgs struct {
+	Code         string `json:"code" form:"code"`
+	CodeVerifier string `json:"code_verifier" form:"code_verifier"`
+	RedirectURI  string `json:"redirect_uri" form:"redirect_uri"`
+	State        string `json:"state" form:"state"`
+}
+
 var errSTSNotInitialized = errors.New("STS API not initialized, please configure STS support")
 
 // LoginSTS - STS user login handler.
@@ -2287,6 +2295,90 @@ func (web *webAPIHandlers) LoginSTS(r *http.Request, args *LoginSTSArgs, reply *
 	}
 
 	// Notify all other MinIO peers to reload temp users
+	for _, nerr := range globalNotificationSys.LoadUser(cred.AccessKey, true) {
+		if nerr.Err != nil {
+			logger.GetReqInfo(ctx).SetTags("peerAddress", nerr.Host.String())
+			logger.LogIf(ctx, nerr.Err)
+		}
+	}
+
+	reply.Token = cred.SessionToken
+	reply.UIVersion = uiVersion
+	return nil
+}
+
+// ExchangeOIDCCode - exchange authorization code + PKCE verifier with provider,
+// validate returned id_token and mint STS credentials.
+func (web *webAPIHandlers) ExchangeOIDCCode(r *http.Request, args *ExchangeOIDCCodeArgs, reply *LoginRep) error {
+	ctx := newWebContext(r, args, "WebExchangeOIDCCode")
+
+	if globalOpenIDConfig.DiscoveryDoc.TokenEndpoint == "" || globalOpenIDValidators == nil {
+		return toJSONError(ctx, errSTSNotInitialized)
+	}
+
+	// Build token request
+	form := url.Values{}
+	form.Set("grant_type", "authorization_code")
+	form.Set("code", args.Code)
+	form.Set("redirect_uri", args.RedirectURI)
+	form.Set("code_verifier", args.CodeVerifier)
+	form.Set("client_id", globalOpenIDConfig.ClientID)
+
+	// POST to token endpoint
+	resp, err := http.PostForm(globalOpenIDConfig.DiscoveryDoc.TokenEndpoint, form)
+	if err != nil {
+		return toJSONError(ctx, err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
+		body, _ := io.ReadAll(resp.Body)
+		return toJSONError(ctx, fmt.Errorf("token exchange failed: %s", string(body)))
+	}
+
+	var tokenResp map[string]interface{}
+	dec := json.NewDecoder(resp.Body)
+	if err := dec.Decode(&tokenResp); err != nil {
+		return toJSONError(ctx, err)
+	}
+
+	idt, ok := tokenResp["id_token"].(string)
+	if !ok || idt == "" {
+		return toJSONError(ctx, fmt.Errorf("id_token not returned by provider"))
+	}
+
+	// Validate id_token using existing validator
+	v, err := globalOpenIDValidators.Get("jwt")
+	if err != nil {
+		logger.LogIf(ctx, err)
+		return toJSONError(ctx, errSTSNotInitialized)
+	}
+
+	m, err := v.Validate(idt, "")
+	if err != nil {
+		return toJSONError(ctx, err)
+	}
+
+	// Extract policy claims and mint STS credentials
+	var policyName string
+	policySet, ok := iampolicy.GetPoliciesFromClaims(m, iamPolicyClaimNameOpenID())
+	if ok {
+		policyName = globalIAMSys.CurrentPolicies(strings.Join(policySet.ToSlice(), ","))
+	}
+	if policyName == "" && globalPolicyOPA == nil {
+		return toJSONError(ctx, fmt.Errorf("%s claim missing from the JWT token, credentials will not be generated", iamPolicyClaimNameOpenID()))
+	}
+	m[iamPolicyClaimNameOpenID()] = policyName
+
+	secret := globalActiveCred.SecretKey
+	cred, err := auth.GetNewCredentialsWithMetadata(m, secret)
+	if err != nil {
+		return toJSONError(ctx, err)
+	}
+
+	if err = globalIAMSys.SetTempUser(cred.AccessKey, cred, policyName); err != nil {
+		return toJSONError(ctx, err)
+	}
+
 	for _, nerr := range globalNotificationSys.LoadUser(cred.AccessKey, true) {
 		if nerr.Err != nil {
 			logger.GetReqInfo(ctx).SetTags("peerAddress", nerr.Host.String())

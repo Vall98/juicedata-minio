@@ -15,14 +15,48 @@
  */
 
 export const OPEN_ID_NONCE_KEY = 'openIDKey'
+export const OPEN_ID_STATE_KEY = 'openIDStateKey'
 
-export const buildOpenIDAuthURL = (authEp, authScopes, redirectURI, clientID, nonce) => {
+// PKCE helpers
+function base64urlencode(a) {
+  // btoa from byte array
+  let str = ''
+  const bytes = new Uint8Array(a)
+  for (let i = 0; i < bytes.byteLength; i++) {
+    str += String.fromCharCode(bytes[i])
+  }
+  return btoa(str).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
+}
+
+export async function codeChallengeFromVerifier(verifier) {
+  const enc = new TextEncoder()
+  const data = enc.encode(verifier)
+  const digest = await window.crypto.subtle.digest('SHA-256', data)
+  return base64urlencode(digest)
+}
+
+export function generateCodeVerifier(len = 64) {
+  const arr = new Uint8Array(len)
+  window.crypto.getRandomValues(arr)
+  // base64url encode
+  return base64urlencode(arr)
+}
+
+export const buildOpenIDAuthURL = (authEp, authScopes, redirectURI, clientID, nonce, state, opts = {}) => {
   const params = new URLSearchParams()
-  params.set("response_type", "id_token")
+  // response_type is 'code' for Authorization Code flow
+  params.set("response_type", "code")
   params.set("scope", authScopes.join(" "))
   params.set("client_id", clientID)
   params.set("redirect_uri", redirectURI)
   params.set("nonce", nonce)
+  params.set("state", state)
+
+  // optional PKCE params
+  if (opts.code_challenge) {
+    params.set('code_challenge', opts.code_challenge)
+    params.set('code_challenge_method', opts.code_challenge_method || 'S256')
+  }
 
   return `${authEp}?${params.toString()}`
 }
