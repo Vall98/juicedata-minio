@@ -27,14 +27,7 @@ export class OpenIDLoginButton extends React.Component {
     event.stopPropagation()
     const { authEp, authScopes, clientId } = this.props
 
-    let redirectURI = window.location.href.split("#")[0]
-    if (redirectURI.endsWith('/')) {
-      redirectURI += 'openid'
-    } else {
-      redirectURI += '/openid'
-    }
-
-    redirectToOpenIDAuthURL(authEp, authScopes, redirectURI, clientId)
+    redirectToOpenIDAuthURL(authEp, authScopes, clientId)
   }
 
   render() {

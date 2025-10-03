@@ -56,12 +56,9 @@ export class OpenIDLogin extends React.Component {
     }
 
     if (this.state.discoveryDoc && this.state.discoveryDoc.authorization_endpoint) {
-      const redirectURI = window.location.href.split("#")[0]
-
       redirectToOpenIDAuthURL(
         this.state.discoveryDoc.authorization_endpoint,
         this.state.discoveryDoc.scopes_supported,
-        redirectURI,
         this.state.clientID
       )
     }

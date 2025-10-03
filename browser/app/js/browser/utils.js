@@ -45,9 +45,9 @@ export function generateCodeVerifier(len = 64) {
   return base64urlencode(arr)
 }
 
-export const buildOpenIDAuthURL = (authEp, authScopes, redirectURI, clientID, nonce, state, opts = {}) => {
+export const buildOpenIDAuthURL = (authEp, authScopes, clientID, nonce, state, opts = {}) => {
   const params = new URLSearchParams()
-  
+  let redirectURI = window.location.origin + "/minio/login/openid"
   // response_type is 'code' for Authorization Code flow
   params.set("response_type", "code")
   params.set("scope", authScopes.join(" "))
@@ -65,7 +65,7 @@ export const buildOpenIDAuthURL = (authEp, authScopes, redirectURI, clientID, no
   return `${authEp}?${params.toString()}`
 }
 
-export function redirectToOpenIDAuthURL(authorization_endpoint, scopes_supported, redirectURI, clientID) {
+export function redirectToOpenIDAuthURL(authorization_endpoint, scopes_supported, clientID) {
   // Store nonce and state in localstorage to check again after the redirect
   const nonce = getRandomString(32)
   storage.setItem(OPEN_ID_NONCE_KEY, nonce)
@@ -81,7 +81,6 @@ export function redirectToOpenIDAuthURL(authorization_endpoint, scopes_supported
     const authURL = buildOpenIDAuthURL(
       authorization_endpoint,
       scopes_supported,
-      redirectURI,
       clientID,
       nonce,
       state,
