@@ -19,6 +19,7 @@ import { getRandomString } from "../utils"
 
 export const OPEN_ID_NONCE_KEY = 'openIDKey'
 export const OPEN_ID_STATE_KEY = 'openIDStateKey'
+export const OPEN_ID_REDIRECT_URI = () => window.location.origin + "/minio/login/openid";
 
 // PKCE helpers
 function base64urlencode(a) {
@@ -47,12 +48,11 @@ export function generateCodeVerifier(len = 64) {
 
 export const buildOpenIDAuthURL = (authEp, authScopes, clientID, nonce, state, opts = {}) => {
   const params = new URLSearchParams()
-  let redirectURI = window.location.origin + "/minio/login/openid"
   // response_type is 'code' for Authorization Code flow
   params.set("response_type", "code")
   params.set("scope", authScopes.join(" "))
   params.set("client_id", clientID)
-  params.set("redirect_uri", redirectURI)
+  params.set("redirect_uri", OPEN_ID_REDIRECT_URI())
   params.set("nonce", nonce)
   params.set("state", state)
 

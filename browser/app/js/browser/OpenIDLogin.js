@@ -24,7 +24,7 @@ import web from "../web"
 import { Redirect } from "react-router-dom"
 import qs from "query-string"
 import storage from "local-storage-fallback"
-import { redirectToOpenIDAuthURL, OPEN_ID_NONCE_KEY, OPEN_ID_STATE_KEY } from './utils'
+import { redirectToOpenIDAuthURL, OPEN_ID_NONCE_KEY, OPEN_ID_STATE_KEY, OPEN_ID_REDIRECT_URI } from './utils'
 
 export class OpenIDLogin extends React.Component {
   constructor(props) {
@@ -103,7 +103,7 @@ export class OpenIDLogin extends React.Component {
       const nonce = storage.getItem(OPEN_ID_NONCE_KEY)
 
       // Exchange code + verifier with backend which will perform token exchange and session creation
-      web.ExchangeCode({ code: values.code, code_verifier, redirect_uri: window.location.href.split('#')[0], state: values.state, nonce })
+      web.ExchangeCode({ code: values.code, code_verifier, redirect_uri: OPEN_ID_REDIRECT_URI(), state: values.state, nonce })
         .then(() => {
           storage.removeItem(OPEN_ID_NONCE_KEY)
           storage.removeItem(OPEN_ID_STATE_KEY)
