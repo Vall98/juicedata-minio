@@ -15,9 +15,7 @@
  */
 
 import React from "react"
-import { getRandomString } from "../utils"
-import storage from "local-storage-fallback"
-import { buildOpenIDAuthURL, OPEN_ID_NONCE_KEY, OPEN_ID_STATE_KEY} from './utils'
+import { redirectToOpenIDAuthURL } from './utils'
 
 export class OpenIDLoginButton extends React.Component {
   constructor(props) {
@@ -36,15 +34,7 @@ export class OpenIDLoginButton extends React.Component {
       redirectURI += '/openid'
     }
 
-    // Store nonce and state in localstorage to check again after the redirect
-    const nonce = getRandomString(32)
-    storage.setItem(OPEN_ID_NONCE_KEY, nonce)
-
-    const state = getRandomString(32)
-    storage.setItem(OPEN_ID_STATE_KEY, state)
-
-    const authURL = buildOpenIDAuthURL(authEp, authScopes, redirectURI, clientId, nonce, state)
-    window.location = authURL
+    redirectToOpenIDAuthURL(authEp, authScopes, redirectURI, clientId)
   }
 
   render() {

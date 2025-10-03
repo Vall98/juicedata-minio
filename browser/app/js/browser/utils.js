@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+import storage from "local-storage-fallback"
+
 export const OPEN_ID_NONCE_KEY = 'openIDKey'
 export const OPEN_ID_STATE_KEY = 'openIDStateKey'
 
@@ -44,6 +46,7 @@ export function generateCodeVerifier(len = 64) {
 
 export const buildOpenIDAuthURL = (authEp, authScopes, redirectURI, clientID, nonce, state, opts = {}) => {
   const params = new URLSearchParams()
+  
   // response_type is 'code' for Authorization Code flow
   params.set("response_type", "code")
   params.set("scope", authScopes.join(" "))
@@ -59,4 +62,30 @@ export const buildOpenIDAuthURL = (authEp, authScopes, redirectURI, clientID, no
   }
 
   return `${authEp}?${params.toString()}`
+}
+
+export function redirectToOpenIDAuthURL(authorization_endpoint, scopes_supported, redirectURI, clientID) {
+  // Store nonce and state in localstorage to check again after the redirect
+  const nonce = getRandomString(32)
+  storage.setItem(OPEN_ID_NONCE_KEY, nonce)
+
+  const state = getRandomString(32)
+  storage.setItem(OPEN_ID_STATE_KEY, state)
+
+  // Generate PKCE verifier and challenge
+  const code_verifier = generateCodeVerifier()
+  storage.setItem(`oidc_code_verifier_${state}`, code_verifier)
+
+  codeChallengeFromVerifier(code_verifier).then(code_challenge => {
+    const authURL = buildOpenIDAuthURL(
+      authorization_endpoint,
+      scopes_supported,
+      redirectURI,
+      clientID,
+      nonce,
+      state,
+      { code_challenge }
+    )
+    window.location = authURL
+  })
 }
