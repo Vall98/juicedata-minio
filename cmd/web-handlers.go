@@ -19,6 +19,7 @@ package cmd
 import (
 	"context"
 	"crypto/subtle"
+	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -2251,10 +2252,9 @@ type ExchangeOIDCCodeArgs struct {
 
 var errSTSNotInitialized = errors.New("STS API not initialized, please configure STS support")
 
-// LoginSTS - STS user login handler.
-func (web *webAPIHandlers) LoginSTS(r *http.Request, args *LoginSTSArgs, reply *LoginRep) error {
-	ctx := newWebContext(r, args, "WebLoginSTS")
-
+// mintSTSFromJWT validates a JWT, extracts policy claims,
+// generates STS credentials and fills the reply.
+func mintSTSFromJWT(ctx context.Context, jwtToken string, reply *LoginRep, nonce string) error {
 	if globalOpenIDValidators == nil {
 		return toJSONError(ctx, errSTSNotInitialized)
 	}
@@ -2265,9 +2265,15 @@ func (web *webAPIHandlers) LoginSTS(r *http.Request, args *LoginSTSArgs, reply *
 		return toJSONError(ctx, errSTSNotInitialized)
 	}
 
-	m, err := v.Validate(args.Token, "")
+	m, err := v.Validate(jwtToken, "")
 	if err != nil {
 		return toJSONError(ctx, err)
+	}
+
+	if nonce != "" {
+		if claimNonce, ok := m["nonce"].(string); !ok || claimNonce != nonce {
+			return toJSONError(ctx, fmt.Errorf("nonce mismatch"))
+		}
 	}
 
 	// JWT has requested a custom claim with policy value set.
@@ -2308,6 +2314,13 @@ func (web *webAPIHandlers) LoginSTS(r *http.Request, args *LoginSTSArgs, reply *
 	return nil
 }
 
+// LoginSTS - STS user login handler.
+func (web *webAPIHandlers) LoginSTS(r *http.Request, args *LoginSTSArgs, reply *LoginRep) error {
+	ctx := newWebContext(r, args, "WebLoginSTS")
+
+	return mintSTSFromJWT(ctx, args.Token, reply, "")
+}
+
 // ExchangeOIDCCode - exchange authorization code + PKCE verifier with provider,
 // validate returned id_token and mint STS credentials.
 func (web *webAPIHandlers) ExchangeOIDCCode(r *http.Request, args *ExchangeOIDCCodeArgs, reply *LoginRep) error {
@@ -2326,7 +2339,15 @@ func (web *webAPIHandlers) ExchangeOIDCCode(r *http.Request, args *ExchangeOIDCC
 	form.Set("client_id", globalOpenIDConfig.ClientID)
 
 	// POST to token endpoint
-	resp, err := http.PostForm(globalOpenIDConfig.DiscoveryDoc.TokenEndpoint, form)
+	req, err := http.NewRequest("POST", globalOpenIDConfig.DiscoveryDoc.TokenEndpoint, strings.NewReader(form.Encode()))
+	if err != nil {
+		return toJSONError(ctx, err)
+	}
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	auth := base64.StdEncoding.EncodeToString([]byte(globalOpenIDConfig.ClientID + ":" + globalOpenIDConfig.ClientSecret))
+	req.Header.Set("Authorization", "Basic "+auth)
+	resp, err := http.DefaultClient.Do(req)
+
 	if err != nil {
 		return toJSONError(ctx, err)
 	}
@@ -2347,57 +2368,12 @@ func (web *webAPIHandlers) ExchangeOIDCCode(r *http.Request, args *ExchangeOIDCC
 		return toJSONError(ctx, fmt.Errorf("id_token not returned by provider"))
 	}
 
-	// Validate id_token using existing validator
-	v, err := globalOpenIDValidators.Get("jwt")
-	if err != nil {
-		logger.LogIf(ctx, err)
-		return toJSONError(ctx, errSTSNotInitialized)
-	}
-
-	m, err := v.Validate(idt, "")
-	if err != nil {
-		return toJSONError(ctx, err)
-	}
-
 	// Require nonce from client and verify it matches nonce claim in id_token
 	if args.Nonce == "" {
 		return toJSONError(ctx, fmt.Errorf("missing nonce"))
 	}
-	if m["nonce"] != args.Nonce {
-		return toJSONError(ctx, fmt.Errorf("nonce mismatch"))
-	}
 
-	// Extract policy claims and mint STS credentials
-	var policyName string
-	policySet, ok := iampolicy.GetPoliciesFromClaims(m, iamPolicyClaimNameOpenID())
-	if ok {
-		policyName = globalIAMSys.CurrentPolicies(strings.Join(policySet.ToSlice(), ","))
-	}
-	if policyName == "" && globalPolicyOPA == nil {
-		return toJSONError(ctx, fmt.Errorf("%s claim missing from the JWT token, credentials will not be generated", iamPolicyClaimNameOpenID()))
-	}
-	m[iamPolicyClaimNameOpenID()] = policyName
-
-	secret := globalActiveCred.SecretKey
-	cred, err := auth.GetNewCredentialsWithMetadata(m, secret)
-	if err != nil {
-		return toJSONError(ctx, err)
-	}
-
-	if err = globalIAMSys.SetTempUser(cred.AccessKey, cred, policyName); err != nil {
-		return toJSONError(ctx, err)
-	}
-
-	for _, nerr := range globalNotificationSys.LoadUser(cred.AccessKey, true) {
-		if nerr.Err != nil {
-			logger.GetReqInfo(ctx).SetTags("peerAddress", nerr.Host.String())
-			logger.LogIf(ctx, nerr.Err)
-		}
-	}
-
-	reply.Token = cred.SessionToken
-	reply.UIVersion = uiVersion
-	return nil
+	return mintSTSFromJWT(ctx, idt, reply, args.Nonce)
 }
 
 // toJSONError converts regular errors into more user friendly
