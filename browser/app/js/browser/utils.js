@@ -15,6 +15,7 @@
  */
 
 import storage from "local-storage-fallback"
+import { getRandomString } from "../utils"
 
 export const OPEN_ID_NONCE_KEY = 'openIDKey'
 export const OPEN_ID_STATE_KEY = 'openIDStateKey'
