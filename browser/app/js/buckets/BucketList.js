@@ -32,6 +32,7 @@ export class BucketList extends React.Component {
       page: 1
     }
     this.loadNextPage = this.loadNextPage.bind(this)
+    this.bucketsDisplayNames = {}
   }
   componentDidUpdate(prevProps) {
     if (this.props.filter !== prevProps.filter) {
@@ -41,14 +42,17 @@ export class BucketList extends React.Component {
     }
   }
   componentWillMount() {
-    const { fetchBuckets, setBucketList, selectBucket } = this.props
+    const { fetchBuckets, setBucketList, selectBucket, getBucketDisplayName } = this.props
     if (web.LoggedIn()) {
-      fetchBuckets()
+      fetchBuckets().then(buckets => {
+        buckets.forEach(bucket => getBucketDisplayName(bucket).then(name => this.bucketsDisplayNames[bucket] = name))
+      })
     } else {
       const { bucket, prefix } = pathSlice(history.location.pathname)
       if (bucket) {
         setBucketList([bucket])
         selectBucket(bucket, prefix)
+        getBucketDisplayName(bucket).then(name => this.bucketsDisplayNames[bucket] = name)
       } else {
         history.replace("/login")
       }
@@ -77,7 +81,7 @@ export class BucketList extends React.Component {
           >
             <ul>
               {visibleBuckets.map(bucket => (
-                <BucketContainer key={bucket} bucket={bucket} />
+                <BucketContainer key={bucket} bucket={bucket} displayName={this.bucketsDisplayNames[bucket]} />
               ))}
             </ul>
           </InfiniteScroll>
@@ -98,8 +102,8 @@ const mapDispatchToProps = dispatch => {
   return {
     fetchBuckets: () => dispatch(actionsBuckets.fetchBuckets()),
     setBucketList: buckets => dispatch(actionsBuckets.setList(buckets)),
-    selectBucket: (bucket, prefix) =>
-      dispatch(actionsBuckets.selectBucket(bucket, prefix))
+    selectBucket: (bucket, prefix) => dispatch(actionsBuckets.selectBucket(bucket, prefix)),
+    getBucketDisplayName: bucket => dispatch(actionsBuckets.getBucketDisplayName(bucket))
   }
 }
 

@@ -32,7 +32,8 @@ export const ObjectContainer = ({
     name: object.name,
     contentType: object.contentType,
     size: humanize.filesize(object.size),
-    lastModified: Moment(object.lastModified).format("lll")
+    lastModified: Moment(object.lastModified).format("lll"),
+    //onClick: () => selectPrefix(`${currentPrefix}${object.name}`)
   }
   if (checkedObjectsCount == 0) {
     props.actionButtons = <ObjectActions object={object} />

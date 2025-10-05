@@ -30,41 +30,43 @@ export const SHOW_BUCKET_POLICY = "buckets/SHOW_BUCKET_POLICY"
 export const SET_POLICIES = "buckets/SET_POLICIES"
 
 export const fetchBuckets = () => {
-  return function(dispatch) {
+  return function (dispatch) {
     const { bucket, prefix } = pathSlice(history.location.pathname)
-    return web.ListBuckets().then(res => {
-      const buckets = res.buckets ? res.buckets.map(bucket => bucket.name) : []
-      if (buckets.length > 0) {
-        dispatch(setList(buckets))
-        if (bucket && buckets.indexOf(bucket) > -1) {
-          dispatch(selectBucket(bucket, prefix))
+    return web
+      .ListBuckets()
+      .then(res => {
+        const buckets = res.buckets ? res.buckets.map(bucket => bucket.name) : []
+        if (buckets.length > 0) {
+          dispatch(setList(buckets))
+          if (bucket && buckets.indexOf(bucket) > -1) {
+            dispatch(selectBucket(bucket, prefix))
+          } else {
+            dispatch(selectBucket(buckets[0]))
+          }
         } else {
-          dispatch(selectBucket(buckets[0]))
+          if (bucket) {
+            dispatch(setList([bucket]))
+            dispatch(selectBucket(bucket, prefix))
+          } else {
+            dispatch(selectBucket(""))
+            history.replace("/")
+          }
         }
-      } else {
-        if (bucket) {
+      })
+      .catch(err => {
+        if (bucket && err.message === "Access Denied." || err.message.indexOf('Prefix access is denied') > -1) {
           dispatch(setList([bucket]))
           dispatch(selectBucket(bucket, prefix))
         } else {
-          dispatch(selectBucket(""))
-          history.replace("/")
+          dispatch(
+            alertActions.set({
+              type: "danger",
+              message: err.message,
+              autoClear: true,
+            })
+          )
         }
-      }
-    })
-    .catch(err => {
-      if (bucket && err.message === "Access Denied." || err.message.indexOf('Prefix access is denied') > -1 ) {
-        dispatch(setList([bucket]))
-        dispatch(selectBucket(bucket, prefix))
-      } else {
-        dispatch(
-          alertActions.set({
-            type: "danger",
-            message: err.message,
-            autoClear: true,
-          })
-        )
-      }
-    })
+      })
   }
 }
 
@@ -82,8 +84,30 @@ export const setFilter = filter => {
   }
 }
 
+export const getBucketDisplayName = (bucket) => {
+  return function (dispatch) {
+    return web
+      .GetBucketTagging(bukket)
+      .then(tags => {
+        if (tags && tags.display_name && tags.network_id) {
+          dispatch(tags.display_name + " (" + tags.network_id + ")")
+        } else {
+          dispatch(bucket.name)
+        }
+      })
+      .catch(err =>
+        dispatch(
+          alertActions.set({
+            type: "danger",
+            message: err.message
+          })
+        )
+      )
+  }
+}
+
 export const selectBucket = (bucket, prefix) => {
-  return function(dispatch) {
+  return function (dispatch) {
     dispatch(setCurrentBucket(bucket))
     dispatch(objectsActions.selectPrefix(prefix || ""))
   }
@@ -97,7 +121,7 @@ export const setCurrentBucket = bucket => {
 }
 
 export const makeBucket = bucket => {
-  return function(dispatch) {
+  return function (dispatch) {
     return web
       .MakeBucket({
         bucketName: bucket
@@ -118,7 +142,7 @@ export const makeBucket = bucket => {
 }
 
 export const deleteBucket = bucket => {
-  return function(dispatch) {
+  return function (dispatch) {
     return web
       .DeleteBucket({
         bucketName: bucket
@@ -133,7 +157,7 @@ export const deleteBucket = bucket => {
         dispatch(removeBucket(bucket))
         dispatch(fetchBuckets())
       })
-      .catch(err => { 
+      .catch(err => {
         dispatch(
           alertActions.set({
             type: "danger",
@@ -165,14 +189,14 @@ export const hideMakeBucketModal = () => ({
 })
 
 export const fetchPolicies = bucket => {
-  return function(dispatch) {
+  return function (dispatch) {
     return web
       .ListAllBucketPolicies({
         bucketName: bucket
       })
       .then(res => {
         let policies = res.policies
-        if(policies)
+        if (policies)
           dispatch(setPolicies(policies))
         else
           dispatch(setPolicies([]))

@@ -105,6 +105,9 @@ class Web {
   ListBuckets() {
     return this.makeCall('ListBuckets')
   }
+  GetBucketTagging(args) {
+    return this.makeCall('GetBucketTagging', args)
+  }
   MakeBucket(args) {
     return this.makeCall('MakeBucket', args)
   }

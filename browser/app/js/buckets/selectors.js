@@ -23,7 +23,7 @@ export const getFilteredBuckets = createSelector(
   bucketsSelector,
   bucketsFilterSelector,
   (buckets, filter) => buckets.filter(
-    bucket => bucket.toLowerCase().indexOf(filter.toLowerCase()) > -1)
+    bucket => bucket.displayName.toLowerCase().indexOf(filter.toLowerCase()) > -1)
 )
 
 export const getCurrentBucket = state => state.buckets.currentBucket

@@ -18,7 +18,7 @@ import React from "react"
 import classNames from "classnames"
 import BucketDropdown from "./BucketDropdown"
 
-export const Bucket = ({ bucket, isActive, selectBucket }) => {
+export const Bucket = ({ bucket, displayName, isActive, selectBucket }) => {
   return (
     <li
       className={classNames({
@@ -35,9 +35,9 @@ export const Bucket = ({ bucket, isActive, selectBucket }) => {
           "fesli-loading": false
         })}
       >
-        {bucket}
+        {displayName}
       </a>
-      <BucketDropdown bucket={bucket}/>
+      <BucketDropdown bucket={bucket} />
     </li>
   )
 }
