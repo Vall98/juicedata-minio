@@ -1,4 +1,4 @@
-FROM ubuntu:20.04
+FROM ubuntu:24.04
 
 LABEL maintainer="MinIO Inc <dev@min.io>"
 
@@ -8,5 +8,5 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-ins
 
 ENV PATH=$PATH:/root/go/bin
 
-RUN go get github.com/go-bindata/go-bindata/go-bindata && \
-    go get github.com/elazarl/go-bindata-assetfs/go-bindata-assetfs
+RUN go install github.com/go-bindata/go-bindata/go-bindata@latest && \
+    go install github.com/elazarl/go-bindata-assetfs/go-bindata-assetfs@latest
