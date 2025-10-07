@@ -24,7 +24,7 @@ export default class JSONrpc {
     this.version = '2.0';
     const parsedUrl = new URL(this.endpoint)
     this.host = parsedUrl.hostname
-    this.path = parsedUrl.path
+    this.path = parsedUrl.pathname
     this.port = parsedUrl.port
 
     switch (parsedUrl.protocol) {

@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import JSONrpc from "../jsonrpc"
 
 describe("jsonrpc", () => {
@@ -32,6 +31,7 @@ describe("jsonrpc", () => {
       endpoint: "http://localhost:9000/webrpc",
       namespace: "Test"
     })
+    console.log(jsonRPC)
     expect(jsonRPC.version).toEqual("2.0")
     expect(jsonRPC.host).toEqual("localhost")
     expect(jsonRPC.port).toEqual("9000")
