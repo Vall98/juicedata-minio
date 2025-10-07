@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 
-import React from "react"
-import AlertComponent from "react-bootstrap/lib/Alert"
+import AlertComponent from "react-bootstrap/Alert"
 
 const Alert = ({ show, type, message, onDismiss }) => (
   <AlertComponent

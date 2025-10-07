@@ -16,7 +16,7 @@
 
 import React from "react"
 import { connect } from "react-redux"
-import { Scrollbars } from "react-custom-scrollbars"
+import { Scrollbars } from "react-custom-scrollbars-2"
 import InfiniteScroll from "react-infinite-scroller"
 import * as actionsBuckets from "./actions"
 import { getFilteredBuckets } from "./selectors"

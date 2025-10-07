@@ -18,8 +18,8 @@ import React from "react"
 import { connect } from "react-redux"
 import web from "../web"
 import * as alertActions from "../alert/actions"
-import { getRandomAccessKey, getRandomSecretKey } from "../utils"
-import jwtDecode from "jwt-decode"
+import { getRandomSecretKey } from "../utils"
+import { jwtDecode } from "jwt-decode"
 import classNames from "classnames"
 
 import { Modal, ModalBody, ModalHeader } from "react-bootstrap"
@@ -204,9 +204,6 @@ export class ChangePasswordModal extends React.Component {
               required="required"
               autoComplete="false"
               align="ig-left"
-              onChange={e => {
-                this.setState({ newSecretKey: e.target.value })
-              }}
             />
           </div>
         </ModalBody>

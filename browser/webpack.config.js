@@ -18,7 +18,7 @@ var webpack = require('webpack')
 var path = require('path')
 var glob = require('glob-all')
 var CopyWebpackPlugin = require('copy-webpack-plugin')
-var PurgecssPlugin = require('purgecss-webpack-plugin')
+var { PurgeCSSPlugin } = require('purgecss-webpack-plugin')
 
 var exports = {
   context: __dirname,
@@ -31,41 +31,38 @@ var exports = {
     filename: 'index_bundle.js',
     publicPath: '/minio/'
   },
+  resolve: {
+    fallback: { path: false }
+  },
   module: {
     rules: [{
-        test: /\.js$/,
-        exclude: /(node_modules|bower_components)/,
-        use: [{
-          loader: 'babel-loader',
-          options: {
-            presets: ['react', 'es2015']
-          }
-        }]
-      }, {
-        test: /\.less$/,
-        use: [{
-          loader: 'style-loader'
-        }, {
-          loader: 'css-loader'
-        }, {
-          loader: 'less-loader'
-        }]
-      }, {
-        test: /\.css$/,
-        use: [{
-          loader: 'style-loader'
-        }, {
-          loader: 'css-loader'
-        }]
-      }, {
-        test: /\.(eot|woff|woff2|ttf|svg|png)/,
-        use: [{
-          loader: 'url-loader'
-        }]
+      test: /\.js$/,
+      exclude: /(node_modules|bower_components)/,
+      use: [{
+        loader: 'babel-loader',
       }]
-  },
-  node:{
-    fs:'empty'
+    }, {
+      test: /\.scss$/,
+      use: [{
+        loader: 'style-loader'
+      }, {
+        loader: 'css-loader'
+      }, {
+        loader: 'sass-loader'
+      }]
+    }, {
+      test: /\.css$/,
+      use: [{
+        loader: 'style-loader'
+      }, {
+        loader: 'css-loader'
+      }]
+    }, {
+      test: /\.(eot|woff|woff2|ttf|svg|png)/,
+      use: [{
+        loader: 'url-loader'
+      }]
+    }]
   },
   devServer: {
     historyApiFallback: {
@@ -75,7 +72,7 @@ var exports = {
       '/minio/webrpc': {
         target: 'http://localhost:9000',
         secure: false,
-        headers: {'Host': "localhost:9000"}
+        headers: { 'Host': "localhost:9000" }
       },
       '/minio/upload/*': {
         target: 'http://localhost:9000',
@@ -92,19 +89,21 @@ var exports = {
     }
   },
   plugins: [
-    new CopyWebpackPlugin({patterns: [
-      {from: 'app/css/loader.css'},
-      {from: 'app/img/browsers/chrome.png'},
-      {from: 'app/img/browsers/firefox.png'},
-      {from: 'app/img/browsers/safari.png'},
-      {from: 'app/img/logo.svg'},
-      {from: 'app/img/favicon/favicon-16x16.png'},
-      {from: 'app/img/favicon/favicon-32x32.png'},
-      {from: 'app/img/favicon/favicon-96x96.png'},
-      {from: 'app/index.html'}
-    ]}),
+    new CopyWebpackPlugin({
+      patterns: [
+        { from: 'app/css/loader.css' },
+        { from: 'app/img/browsers/chrome.png' },
+        { from: 'app/img/browsers/firefox.png' },
+        { from: 'app/img/browsers/safari.png' },
+        { from: 'app/img/logo.svg' },
+        { from: 'app/img/favicon/favicon-16x16.png' },
+        { from: 'app/img/favicon/favicon-32x32.png' },
+        { from: 'app/img/favicon/favicon-96x96.png' },
+        { from: 'app/index.html' }
+      ]
+    }),
     new webpack.ContextReplacementPlugin(/moment[\\\/]locale$/, /^\.\/(en)$/),
-    new PurgecssPlugin({
+    new PurgeCSSPlugin({
       paths: glob.sync([
         path.join(__dirname, 'app/index.html'),
         path.join(__dirname, 'app/js/*.js')

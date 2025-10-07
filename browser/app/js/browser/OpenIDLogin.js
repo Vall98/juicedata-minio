@@ -21,7 +21,7 @@ import Alert from "../alert/Alert"
 import * as actionsAlert from "../alert/actions"
 import InputGroup from "./InputGroup"
 import web from "../web"
-import { Redirect } from "react-router-dom"
+import { Navigate } from "react-router-dom"
 import qs from "query-string"
 import storage from "local-storage-fallback"
 import { redirectToOpenIDAuthURL, OPEN_ID_NONCE_KEY, OPEN_ID_STATE_KEY, OPEN_ID_REDIRECT_URI } from './utils'
@@ -127,7 +127,7 @@ export class OpenIDLogin extends React.Component {
   render() {
     const { clearAlert, alert } = this.props
     if (web.LoggedIn()) {
-      return <Redirect to={"/"} />
+      return <Navigate to={"/"} />
     }
     let alertBox = <Alert {...alert} onDismiss={clearAlert} />
     // Make sure you don't show a fading out alert box on the initial web-page load.

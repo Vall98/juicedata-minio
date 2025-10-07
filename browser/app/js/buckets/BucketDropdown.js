@@ -19,7 +19,7 @@ import classNames from "classnames"
 import { connect } from "react-redux"
 import * as actionsBuckets from "./actions"
 import { getCurrentBucket } from "./selectors"
-import Dropdown from "react-bootstrap/lib/Dropdown"
+import Dropdown from "react-bootstrap/Dropdown"
 
 export class BucketDropdown extends React.Component {
   constructor(props) {

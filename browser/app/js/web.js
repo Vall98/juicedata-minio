@@ -144,6 +144,23 @@ class Web {
   }
 }
 
-const web = new Web(`${window.location.protocol}//${window.location.host}${minioBrowserPrefix}/webrpc`);
+// If running in a non-browser environment (like some tests), provide a lightweight mock to avoid errors
+let web
+if (typeof window === 'undefined') {
+  web = {
+    LoggedIn: () => false,
+    Login: () => Promise.reject(new Error('not available')),
+    Logout: () => {},
+    GetToken: () => null,
+    ServerInfo: () => Promise.resolve({}),
+    StorageInfo: () => Promise.resolve({}),
+    ListBuckets: () => Promise.resolve([]),
+    ListObjects: () => Promise.resolve([]),
+    MakeBucket: () => Promise.reject(new Error('not available')),
+    DeleteBucket: () => Promise.reject(new Error('not available'))
+  }
+} else {
+  web = new Web(`${window.location.protocol}//${window.location.host}${minioBrowserPrefix}/webrpc`)
+}
 
-export default web;
+export default web
