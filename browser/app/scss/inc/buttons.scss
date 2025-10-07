@@ -1,0 +1,57 @@
+.btn {
+    border: 0;
+    padding: 5px 10px;
+    font-size: 12px;
+    line-height: 1.5;
+    border-radius: 2px;
+    text-align: center;
+    @include transition(all);
+    transition-duration: 300ms;
+
+    &:hover,
+    &:focus {
+        opacity: 0.9;
+    }
+}
+
+/*-----------------------------------
+    Button Variants
+------------------------------------*/
+@mixin btn-variant($bg-color, $color) {
+    color: $color;
+    background-color: $bg-color;
+
+    &:hover,
+    &:focus {
+        color: $color;
+        background-color: adjust-color($bg-color, $lightness: -6%);
+    }
+
+
+}
+
+.btn-block {
+    display: block;
+    width: 100%;
+}
+
+.btn-white {
+    @include btn-variant(#fff, adjust-color($text-color, $lightness: -20%));
+}
+
+.btn-link {
+    @include btn-variant(#eee, #545454);
+}
+
+.btn-danger {
+    @include btn-variant($red, $white);
+}
+
+.btn-primary {
+    @include btn-variant($blue, $white);
+}
+
+.btn-success {
+    @include btn-variant($green, $white);
+}
+//-----------------------------------
