@@ -10,19 +10,16 @@
     "format": "esformatter -i 'app/**/*.js'"
   },
   "jest": {
-    "setupFiles": [
-      "<rootDir>/app/js/jest/setupEnv.js"
-    ],
     "setupFilesAfterEnv": [
-      "<rootDir>/app/js/jest/setup.js"
+      "<rootDir>/jest.setup.js"
     ],
     "testEnvironment": "jsdom",
-    "testURL": "https://localhost:8080",
+    "testEnvironmentOptions": {
+      "url": "https://localhost:8080"
+    },
     "moduleNameMapper": {
-      "^react-bootstrap/lib/(.*)$": "<rootDir>/app/js/jest/__mocks__/react-bootstrap/$1.js",
-      "^history/createBrowserHistory$": "<rootDir>/app/js/jest/__mocks__/createBrowserHistory.js",
-      "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/app/js/jest/__mocks__/fileMock.js",
-      "\\.(css|scss)$": "identity-obj-proxy"
+      "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/__mocks__/fileMock.js",
+      "\\.(css|less|scss)$": "identity-obj-proxy"
     }
   },
   "repository": {
