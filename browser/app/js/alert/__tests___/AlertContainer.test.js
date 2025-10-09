@@ -14,21 +14,21 @@
  * limitations under the License.
  */
 
-import React from "react"
-import { shallow, mount } from "enzyme"
+import { render, screen } from "@testing-library/react"
 import { AlertContainer } from "../AlertContainer"
 
 describe("Alert", () => {
   it("should render without crashing", () => {
-    shallow(
+    render(
       <AlertContainer alert={{ show: true, type: "danger", message: "Test" }} />
     )
+    expect(screen.getByText(/^Test$/)).toBeInTheDocument()
   })
 
   it("should render nothing if message is empty", () => {
-    const wrapper = shallow(
+    render(
       <AlertContainer alert={{ show: true, type: "danger", message: "" }} />
     )
-    expect(wrapper.find("Alert").length).toBe(0)
+    expect(screen.queryByTestId("alert")).toBeNull();
   })
 })
