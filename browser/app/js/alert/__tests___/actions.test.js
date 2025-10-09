@@ -31,7 +31,6 @@ describe("Alert actions", () => {
   it("creates alert/SET action", () => {
     store.dispatch(actionsAlert.set({ message: "Test alert", type: "danger" }))
     const state = store.getState()
-    console.log(state)
     expect(state.alert).toEqual({ show: true, id: 0, message: "Test alert", type: "danger" })
   })
 
