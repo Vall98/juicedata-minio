@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 
-import React from "react"
-import { shallow } from "enzyme"
+import { fireEvent, render, screen } from "@testing-library/react"
 import { BrowserDropdown } from "../BrowserDropdown"
 
 describe("BrowserDropdown", () => {
@@ -26,14 +25,14 @@ describe("BrowserDropdown", () => {
   }
 
   it("should render without crashing", () => {
-    shallow(
+    render(
       <BrowserDropdown serverInfo={serverInfo} fetchServerInfo={jest.fn()} />
     )
   })
 
   it("should call fetchServerInfo after its mounted", () => {
     const fetchServerInfo = jest.fn()
-    const wrapper = shallow(
+    render(
       <BrowserDropdown
         serverInfo={serverInfo}
         fetchServerInfo={fetchServerInfo}
@@ -43,20 +42,26 @@ describe("BrowserDropdown", () => {
   })
 
   it("should show AboutModal when About link is clicked", () => {
-    const wrapper = shallow(
+    render(
       <BrowserDropdown serverInfo={serverInfo} fetchServerInfo={jest.fn()} />
     )
-    wrapper.find("#show-about").simulate("click", { preventDefault: jest.fn() })
-    wrapper.update()
-    expect(wrapper.state("showAboutModal")).toBeTruthy()
-    expect(wrapper.find("AboutModal").length).toBe(1)
+    const dropdownButton = screen.getByRole("button")
+    fireEvent.click(dropdownButton)
+    const about = screen.getByText(/about/i);
+    fireEvent.click(about)
+    const modal = screen.getByRole("dialog");
+    expect(modal).toBeInTheDocument();
+    expect(modal).toHaveTextContent(/×VersiontestPlatformtestRuntimetest/i);
   })
 
   it("should logout and redirect to /login when logout is clicked", () => {
-    const wrapper = shallow(
+    render(
       <BrowserDropdown serverInfo={serverInfo} fetchServerInfo={jest.fn()} />
     )
-    wrapper.find("#logout").simulate("click", { preventDefault: jest.fn() })
+    const dropdownButton = screen.getByRole("button")
+    fireEvent.click(dropdownButton)
+    const logout = screen.getByText(/logout/i);
+    fireEvent.click(logout)
     expect(window.location.pathname.endsWith("/login")).toBeTruthy()
   })
 })

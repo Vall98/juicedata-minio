@@ -14,16 +14,17 @@
  * limitations under the License.
  */
 
-import React from "react"
-import { shallow } from "enzyme"
+import { render } from "@testing-library/react"
+import { Provider } from "react-redux"
 import Browser from "../Browser"
-import configureStore from "redux-mock-store"
-
-const mockStore = configureStore()
+import store from "../../store/store"
 
 describe("Browser", () => {
   it("should render without crashing", () => {
-    const store = mockStore()
-    shallow(<Browser store={store}/>)
+    render(
+      <Provider store={store}>
+        <Browser />
+      </Provider>
+    )
   })
 })

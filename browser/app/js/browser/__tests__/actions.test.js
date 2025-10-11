@@ -13,10 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-import configureStore from "redux-mock-store"
-import thunk from "redux-thunk"
+import { configureStore } from "@reduxjs/toolkit"
 import * as actionsCommon from "../actions"
+import browserReducer from "../reducer"
 
 jest.mock("../../web", () => ({
   StorageInfo: jest.fn(() => {
@@ -34,23 +33,23 @@ jest.mock("../../web", () => ({
   })
 }))
 
-const middlewares = [thunk]
-const mockStore = configureStore(middlewares)
-
 describe("Common actions", () => {
+  let store;
+  beforeEach(() => {
+    store = configureStore({
+      reducer: { browser: browserReducer },
+      middleware: (getDefaultMiddleware) => getDefaultMiddleware(),
+    });
+  })
+
   it("creates common/SET_STORAGE_INFO after fetching the storage details ", () => {
-    const store = mockStore()
-    const expectedActions = [
-      { type: "common/SET_STORAGE_INFO", storageInfo: { used: 60 } }
-    ]
     return store.dispatch(actionsCommon.fetchStorageInfo()).then(() => {
-      const actions = store.getActions()
-      expect(actions).toEqual(expectedActions)
+      const state = store.getState()
+      expect(state.browser).toEqual({ serverInfo: {}, sidebarOpen: false, storageInfo: { used: 60 } })
     })
   })
 
   it("creates common/SET_SERVER_INFO after fetching the server details", () => {
-    const store = mockStore()
     const expectedActions = [
       {
         type: "common/SET_SERVER_INFO",
@@ -63,8 +62,16 @@ describe("Common actions", () => {
       }
     ]
     return store.dispatch(actionsCommon.fetchServerInfo()).then(() => {
-      const actions = store.getActions()
-      expect(actions).toEqual(expectedActions)
+      const state = store.getState()
+      expect(state.browser).toEqual({
+        serverInfo: {
+          version: "test", platform: "test", runtime: "test", info: "test", userInfo: undefined
+        },
+        storageInfo: {
+          used: 0,
+        },
+        sidebarOpen: false,
+      })
     })
   })
 })
