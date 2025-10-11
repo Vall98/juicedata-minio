@@ -17,12 +17,8 @@
 // File for all the browser constants.
 
 // minioBrowserPrefix absolute path.
-// Guard access to window so tests running in different environments don't crash at import time.
-let pathname = "/"
-if (typeof window !== "undefined" && window.location && window.location.pathname) {
-	pathname = window.location.pathname
-}
-export const minioBrowserPrefix = pathname.slice(0, pathname.indexOf("/", 1)) || "/"
+var p = window.location.pathname
+export const minioBrowserPrefix = p.slice(0, p.indexOf("/", 1))
 
 export const READ_ONLY = "readonly"
 export const WRITE_ONLY = "writeonly"
