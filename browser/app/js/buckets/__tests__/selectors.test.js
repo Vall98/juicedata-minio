@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { getFilteredBuckets, getCurrentBucket } from "../selectors"
+import { getFilteredBuckets } from "../selectors"
 
 describe("getFilteredBuckets", () => {
   let state
