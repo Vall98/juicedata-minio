@@ -14,67 +14,46 @@
  * limitations under the License.
  */
 
-import configureStore from "redux-mock-store"
-import thunk from "redux-thunk"
+import { configureStore } from "@reduxjs/toolkit"
+import * as bucketsActions from "../../buckets/actions"
+import * as objectsActions from "../../objects/actions"
 import * as uploadsActions from "../actions"
-
-const middlewares = [thunk]
-const mockStore = configureStore(middlewares)
+import alertReducer from "../../alert/reducer";
+import bucketsReducer from "../../buckets/reducer"
+import objectsReducer from "../../objects/reducer"
+import uploadReducer from "../reducer";
 
 describe("Uploads actions", () => {
+  let store;
+  beforeEach(() => {
+    store = configureStore({
+      reducer: { alert: alertReducer, buckets: bucketsReducer, objects: objectsReducer, upload: uploadReducer },
+      middleware: (getDefaultMiddleware) => getDefaultMiddleware(),
+    });
+  })
+
   it("creates uploads/ADD action", () => {
-    const store = mockStore()
-    const expectedActions = [
-      {
-        type: "uploads/ADD",
-        slug: "a-b-c",
-        size: 100,
-        name: "test"
-      }
-    ]
     store.dispatch(uploadsActions.add("a-b-c", 100, "test"))
-    const actions = store.getActions()
-    expect(actions).toEqual(expectedActions)
+    const state = store.getState()
+    expect(state.upload).toEqual({ files: { "a-b-c": { loaded: 0, name: "test", size: 100 } }, showAbortModal: false })
   })
 
   it("creates uploads/UPDATE_PROGRESS action", () => {
-    const store = mockStore()
-    const expectedActions = [
-      {
-        type: "uploads/UPDATE_PROGRESS",
-        slug: "a-b-c",
-        loaded: 50
-      }
-    ]
     store.dispatch(uploadsActions.updateProgress("a-b-c", 50))
-    const actions = store.getActions()
-    expect(actions).toEqual(expectedActions)
+    const state = store.getState()
+    expect(state.upload).toEqual({ files: { "a-b-c": { loaded: 50 } }, showAbortModal: false })
   })
 
   it("creates uploads/STOP action", () => {
-    const store = mockStore()
-    const expectedActions = [
-      {
-        type: "uploads/STOP",
-        slug: "a-b-c"
-      }
-    ]
     store.dispatch(uploadsActions.stop("a-b-c"))
-    const actions = store.getActions()
-    expect(actions).toEqual(expectedActions)
+    const state = store.getState()
+    expect(state.upload).toEqual({ files: {}, showAbortModal: false })
   })
 
   it("creates uploads/SHOW_ABORT_MODAL action", () => {
-    const store = mockStore()
-    const expectedActions = [
-      {
-        type: "uploads/SHOW_ABORT_MODAL",
-        show: true
-      }
-    ]
     store.dispatch(uploadsActions.showAbortModal())
-    const actions = store.getActions()
-    expect(actions).toEqual(expectedActions)
+    const state = store.getState()
+    expect(state.upload).toEqual({ files: {}, showAbortModal: true })
   })
 
   describe("uploadFile", () => {
@@ -84,41 +63,20 @@ describe("Uploads actions", () => {
     file.name = "file1"
 
     it("creates alerts/SET action when currentBucket is not present", () => {
-      const store = mockStore({
-        buckets: { currentBucket: "" }
-      })
-      const expectedActions = [
-        {
-          type: "alert/SET",
-          alert: {
-            id: 0,
-            type: "danger",
-            message: "Please choose a bucket before trying to upload files."
-          }
-        }
-      ]
+      store.dispatch(bucketsActions.setCurrentBucket())
       const file = new Blob(["file content"], { type: "text/plain" })
       store.dispatch(uploadsActions.uploadFile(file))
-      const actions = store.getActions()
-      expect(actions).toEqual(expectedActions)
+      const state = store.getState()
+      expect(state.alert).toEqual({ id: 0, type: "danger", message: "Please choose a bucket before trying to upload files.", show: true })
+      expect(state.upload).toEqual({ files: {}, showAbortModal: false })
     })
 
     it("creates uploads/ADD action before uploading the file", () => {
-      const store = mockStore({
-        buckets: { currentBucket: "test1" },
-        objects: { currentPrefix: "pre1/" }
-      })
-      const expectedActions = [
-        {
-          type: "uploads/ADD",
-          slug: "test1-pre1/-file1",
-          size: file.size,
-          name: file.name
-        }
-      ]
+      store.dispatch(bucketsActions.setCurrentBucket("test1"))
+      store.dispatch(objectsActions.setCurrentPrefix("pre1/"))
       store.dispatch(uploadsActions.uploadFile(file))
-      const actions = store.getActions()
-      expect(actions).toEqual(expectedActions)
+      const state = store.getState()
+      expect(state.upload).toEqual({ files: { "test1-pre1/-file1": { loaded: 0, name: "file1", size: 12 }}, showAbortModal: false })
     })
 
     it("should open and send XMLHttpRequest", () => {
@@ -133,10 +91,8 @@ describe("Uploads actions", () => {
         }
       })
       window.XMLHttpRequest = jest.fn().mockImplementation(xhrMockClass)
-      const store = mockStore({
-        buckets: { currentBucket: "test1" },
-        objects: { currentPrefix: "pre1/" }
-      })
+      store.dispatch(bucketsActions.setCurrentBucket("test1"))
+      store.dispatch(objectsActions.setCurrentPrefix("pre1/"))
       store.dispatch(uploadsActions.uploadFile(file))
       const objectPath = encodeURIComponent("pre1/file1")
       expect(open).toHaveBeenCalledWith(
@@ -149,19 +105,8 @@ describe("Uploads actions", () => {
   })
 
   it("creates uploads/STOP and uploads/SHOW_ABORT_MODAL after abortUpload", () => {
-    const store = mockStore()
-    const expectedActions = [
-      {
-        type: "uploads/STOP",
-        slug: "a-b/-c"
-      },
-      {
-        type: "uploads/SHOW_ABORT_MODAL",
-        show: false
-      }
-    ]
     store.dispatch(uploadsActions.abortUpload("a-b/-c"))
-    const actions = store.getActions()
-    expect(actions).toEqual(expectedActions)
+    const state = store.getState()
+    expect(state.upload).toEqual({ files: {}, showAbortModal: false })
   })
 })
