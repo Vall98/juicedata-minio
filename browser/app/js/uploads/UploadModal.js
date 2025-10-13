@@ -16,7 +16,6 @@
 
 import React from "react"
 import humanize from "humanize"
-import classNames from "classnames"
 import { connect } from "react-redux"
 
 import { ProgressBar } from "react-bootstrap"
