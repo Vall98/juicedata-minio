@@ -23,6 +23,7 @@ import * as actionsCommon from "./actions"
 export const MobileHeader = ({ sidebarOpen, toggleSidebar }) => (
   <header className="fe-header-mobile hidden-lg hidden-md">
     <div
+      data-testid="sidebar-toggle"
       id="sidebar-toggle"
       className={
         "feh-trigger " +

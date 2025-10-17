@@ -14,29 +14,50 @@
  * limitations under the License.
  */
 
-import React from "react"
-import { shallow } from "enzyme"
+import { render, screen } from "@testing-library/react"
+import { Provider } from "react-redux"
 import Header from "../Header"
+import store from "../../store/store"
+import web from "../../web"
 
 jest.mock("../../web", () => ({
   LoggedIn: jest
-    .fn(() => true)
-    .mockReturnValueOnce(true)
-    .mockReturnValueOnce(false)
+    .fn(() => true),
+  ServerInfo: jest
+    .fn(() => Promise.resolve({})),
+  StorageInfo: jest
+    .fn(() => Promise.resolve({used: 60})),
 }))
+
 describe("Header", () => {
   it("should render without crashing", () => {
-    shallow(<Header />)
+    render(
+      <Provider store={store}>
+        <Header />
+      </Provider>
+    )
   })
 
   it("should render Login button when the user has not LoggedIn", () => {
-    const wrapper = shallow(<Header />)
-    expect(wrapper.find("a").text()).toBe("Login")
+    web.LoggedIn.mockReturnValue(false)
+    render(
+      <Provider store={store}>
+        <Header />
+      </Provider>
+    )
+    const link = screen.getByRole('link', { name: /login/i })
+    expect(link).toBeInTheDocument()
   })
 
   it("should render StorageInfo and BrowserDropdown when the user has LoggedIn", () => {
-    const wrapper = shallow(<Header />)
-    expect(wrapper.find("Connect(BrowserDropdown)").length).toBe(1)
-    expect(wrapper.find("Connect(StorageInfo)").length).toBe(1)
+    web.LoggedIn.mockReturnValue(true)
+    render(
+      <Provider store={store}>
+        <Header />
+      </Provider>
+    )
+    expect(screen.queryByRole("link", { name: /login/i })).not.toBeInTheDocument()
+    expect(screen.getByRole("button")).toBeInTheDocument()
+    expect(screen.getByText(/60 bytes/i)).toBeInTheDocument()
   })
 })
