@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import React from "react"
 import { connect } from "react-redux"
 import { Dropdown, OverlayTrigger, Tooltip } from "react-bootstrap"
 import web from "../web"
@@ -46,7 +45,7 @@ export const MainActions = ({
   if (loggedIn || prefixWritable) {
     return (
       <Dropdown dropup className="feb-actions" id="fe-action-toggle">
-        <Dropdown.Toggle noCaret className="feba-toggle">
+        <Dropdown.Toggle className="feba-toggle">
           <span>
             <i className="fas fa-plus" />
           </span>

@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import React from "react"
 import { Modal, ModalBody } from "react-bootstrap"
 
 let ConfirmModal = ({
@@ -30,7 +29,7 @@ let ConfirmModal = ({
 }) => {
   return (
     <Modal
-      bsSize="small"
+      size="small"
       animation={false}
       show={show}
       className={"modal-confirm " + (baseClass || "")}

@@ -49,7 +49,7 @@ export class PrefixActions extends React.Component {
     const { object, showShareObjectModal, shareObjectName } = this.props
     return (
       <Dropdown id={`obj-actions-${object.name}`}>
-        <Dropdown.Toggle noCaret className="fia-toggle" />
+        <Dropdown.Toggle className="fia-toggle" />
         <Dropdown.Menu>
           <a
             href=""

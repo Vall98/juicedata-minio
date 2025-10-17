@@ -66,8 +66,8 @@ export class BrowserDropdown extends React.Component {
     const { serverInfo } = this.props
     return (
       <li>
-        <Dropdown pullRight id="top-right-menu">
-          <Dropdown.Toggle noCaret>
+        <Dropdown align="end" id="top-right-menu">
+          <Dropdown.Toggle>
             <i className="fas fa-bars" />
           </Dropdown.Toggle>
           <Dropdown.Menu className="dropdown-menu-right">
