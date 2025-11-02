@@ -50,17 +50,6 @@ describe("Common actions", () => {
   })
 
   it("creates common/SET_SERVER_INFO after fetching the server details", () => {
-    const expectedActions = [
-      {
-        type: "common/SET_SERVER_INFO",
-        serverInfo: {
-          version: "test",
-          platform: "test",
-          runtime: "test",
-          info: "test"
-        }
-      }
-    ]
     return store.dispatch(actionsCommon.fetchServerInfo()).then(() => {
       const state = store.getState()
       expect(state.browser).toEqual({

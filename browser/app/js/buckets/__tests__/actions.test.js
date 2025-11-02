@@ -18,7 +18,7 @@ import { configureStore } from "@reduxjs/toolkit"
 import * as actionsBuckets from "../actions"
 import history from "../../history"
 import alertReducer from "../../alert/reducer"
-import bucketReducer from "../reducer"
+import bucketsReducer from "../reducer"
 
 jest.mock("../../web", () => ({
   ListBuckets: jest.fn(() => {
@@ -40,7 +40,7 @@ describe("Buckets actions", () => {
   let store;
   beforeEach(() => {
     store = configureStore({
-      reducer: { alert: alertReducer, bucket: bucketReducer },
+      reducer: { alert: alertReducer, buckets: bucketsReducer },
       middleware: (getDefaultMiddleware) => getDefaultMiddleware(),
     });
   })
@@ -56,7 +56,7 @@ describe("Buckets actions", () => {
     }
     return store.dispatch(actionsBuckets.fetchBuckets()).then(() => {
       const state = store.getState()
-      expect(state.bucket).toEqual(expectedState)
+      expect(state.buckets).toEqual(expectedState)
     })
   })
 
@@ -72,7 +72,7 @@ describe("Buckets actions", () => {
     }
     return store.dispatch(actionsBuckets.fetchBuckets()).then(() => {
       const state = store.getState()
-      expect(state.bucket).toEqual(expectedState)
+      expect(state.buckets).toEqual(expectedState)
     })
   })
 
@@ -88,7 +88,7 @@ describe("Buckets actions", () => {
     }
     return store.dispatch(actionsBuckets.fetchBuckets()).then(() => {
       const state = store.getState()
-      expect(state.bucket).toEqual(expectedState)
+      expect(state.buckets).toEqual(expectedState)
     })
   })
 
@@ -103,7 +103,7 @@ describe("Buckets actions", () => {
     }
     store.dispatch(actionsBuckets.selectBucket("test1"))
     const state = store.getState()
-    expect(state.bucket).toEqual(expectedState)
+    expect(state.buckets).toEqual(expectedState)
   })
 
   it("creates buckets/SHOW_MAKE_BUCKET_MODAL for showMakeBucketModal", () => {
@@ -117,7 +117,7 @@ describe("Buckets actions", () => {
     }
     store.dispatch(actionsBuckets.showMakeBucketModal())
     const state = store.getState()
-    expect(state.bucket).toEqual(expectedState)
+    expect(state.buckets).toEqual(expectedState)
   })
 
   it("creates buckets/SHOW_MAKE_BUCKET_MODAL for hideMakeBucketModal", () => {
@@ -131,7 +131,7 @@ describe("Buckets actions", () => {
     }
     store.dispatch(actionsBuckets.hideMakeBucketModal())
     const state = store.getState()
-    expect(state.bucket).toEqual(expectedState)
+    expect(state.buckets).toEqual(expectedState)
   })
 
   it("creates buckets/SHOW_BUCKET_POLICY for showBucketPolicy", () => {
@@ -145,7 +145,7 @@ describe("Buckets actions", () => {
     }
     store.dispatch(actionsBuckets.showBucketPolicy())
     const state = store.getState()
-    expect(state.bucket).toEqual(expectedState)
+    expect(state.buckets).toEqual(expectedState)
   })
 
   it("creates buckets/SHOW_BUCKET_POLICY for hideBucketPolicy", () => {
@@ -159,7 +159,7 @@ describe("Buckets actions", () => {
     }
     store.dispatch(actionsBuckets.hideBucketPolicy())
     const state = store.getState()
-    expect(state.bucket).toEqual(expectedState)
+    expect(state.buckets).toEqual(expectedState)
   })
 
   it("creates buckets/SET_POLICIES action", () => {
@@ -173,7 +173,7 @@ describe("Buckets actions", () => {
     }
     store.dispatch(actionsBuckets.setPolicies(["test1", "test2"]))
     const state = store.getState()
-    expect(state.bucket).toEqual(expectedState)
+    expect(state.buckets).toEqual(expectedState)
   })
 
   it("creates buckets/ADD action", () => {
@@ -187,7 +187,7 @@ describe("Buckets actions", () => {
     }
     store.dispatch(actionsBuckets.addBucket("test"))
     const state = store.getState()
-    expect(state.bucket).toEqual(expectedState)
+    expect(state.buckets).toEqual(expectedState)
   })
 
   it("creates buckets/REMOVE action", () => {
@@ -201,7 +201,7 @@ describe("Buckets actions", () => {
     }
     store.dispatch(actionsBuckets.removeBucket("test"))
     const state = store.getState()
-    expect(state.bucket).toEqual(expectedState)
+    expect(state.buckets).toEqual(expectedState)
   })
 
   it("creates buckets/ADD and buckets/SET_CURRENT_BUCKET after creating the bucket", () => {
@@ -215,7 +215,7 @@ describe("Buckets actions", () => {
     }
     return store.dispatch(actionsBuckets.makeBucket("test1")).then(() => {
       const state = store.getState()
-      expect(state.bucket).toEqual(expectedState)
+      expect(state.buckets).toEqual(expectedState)
     })
   })
 
@@ -231,7 +231,7 @@ describe("Buckets actions", () => {
       }
       return store.dispatch(actionsBuckets.deleteBucket("test3")).then(() => {
         const state = store.getState()
-        expect(state.bucket).toEqual(expectedState)
+        expect(state.buckets).toEqual(expectedState)
         expect(state.alert).toEqual({
           id: 0,
           message: "Bucket 'test3' has been deleted.",
