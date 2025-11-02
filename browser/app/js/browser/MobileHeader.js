@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import React from "react"
 import classNames from "classnames"
 import { connect } from "react-redux"
 import logo from "../../img/logo.svg"

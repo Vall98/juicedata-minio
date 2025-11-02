@@ -31,7 +31,8 @@ export class Login extends React.Component {
       accessKey: "",
       secretKey: "",
       discoveryDoc: {},
-      clientId: ""
+      clientId: "",
+      redirectToHome: false
     }
   }
 
@@ -50,7 +51,7 @@ export class Login extends React.Component {
 
   handleSubmit(event) {
     event.preventDefault()
-    const { showAlert, clearAlert, history } = this.props
+    const { showAlert, clearAlert } = this.props
     let message = ""
     if (this.state.accessKey === "") {
       message = "Access Key cannot be empty"
@@ -71,21 +72,20 @@ export class Login extends React.Component {
         // Clear alerts from previous login attempts
         clearAlert()
 
-        history.push("/")
+        // Use Navigate component for navigation instead of history.push
+        this.setState({ redirectToHome: true })
       })
       .catch(e => {
         showAlert("danger", e.message)
       })
   }
 
-  componentWillMount() {
+  componentDidMount() {
     const { clearAlert } = this.props
     // Clear out any stale message in the alert of previous page
     clearAlert()
     document.body.classList.add("is-guest")
-  }
 
-  componentDidMount() {
     web.GetDiscoveryDoc().then(({ DiscoveryDoc, clientId }) => {
       this.setState({
         clientId,
@@ -100,7 +100,7 @@ export class Login extends React.Component {
 
   render() {
     const { clearAlert, alert } = this.props
-    if (web.LoggedIn()) {
+    if (web.LoggedIn() || this.state.redirectToHome) {
       return <Navigate to={"/"} />
     }
     let alertBox = <Alert {...alert} onDismiss={clearAlert} />
