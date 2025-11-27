@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-import { createStore, applyMiddleware } from "redux"
-import { thunk } from "redux-thunk"
+import { configureStore } from "@reduxjs/toolkit"
 import reducers from "../reducers"
 
-const createStoreWithMiddleware = applyMiddleware(thunk)(createStore)
+const store = configureStore({
+  reducer: reducers,
+  middleware: (getDefaultMiddleware) => getDefaultMiddleware(),
+});
 
-export default function configureStore(initialState) {
-  const store = createStoreWithMiddleware(reducers, initialState)
-  return store
-}
+export default store
