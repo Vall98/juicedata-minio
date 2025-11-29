@@ -88,6 +88,7 @@ export class ObjectActions extends React.Component {
             href=""
             className="fiad-action"
             title="Share"
+            aria-label="Share"
             onClick={this.shareObject.bind(this)}
           >
             <i className="fas fa-share-alt" />
@@ -97,6 +98,7 @@ export class ObjectActions extends React.Component {
               href=""
               className="fiad-action"
               title="Preview"
+              aria-label="Preview"
               onClick={this.showPreviewModal.bind(this)}
             >
               <i className="far fa-file-image" />
@@ -106,6 +108,7 @@ export class ObjectActions extends React.Component {
             href=""
             className="fiad-action"
             title="Download"
+            aria-label="Download"
             onClick={this.handleDownload.bind(this)}
           >
             <i className="fas fa-cloud-download-alt" />
@@ -114,6 +117,7 @@ export class ObjectActions extends React.Component {
             href=""
             className="fiad-action"
             title="Delete"
+            aria-label="Delete"
             onClick={this.showDeleteConfirmModal.bind(this)}
           >
             <i className="fas fa-trash-alt" />
