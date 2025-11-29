@@ -86,6 +86,7 @@ export class ObjectActions extends React.Component {
         <Dropdown.Menu>
           <a
             href=""
+            role="link"
             className="fiad-action"
             title="Share"
             aria-label="Share"
@@ -96,6 +97,7 @@ export class ObjectActions extends React.Component {
           {getDataType(object.name, object.contentType) == "image" && (
             <a
               href=""
+              role="link"
               className="fiad-action"
               title="Preview"
               aria-label="Preview"
@@ -106,6 +108,7 @@ export class ObjectActions extends React.Component {
           )}
           <a
             href=""
+            role="link"
             className="fiad-action"
             title="Download"
             aria-label="Download"
@@ -115,6 +118,7 @@ export class ObjectActions extends React.Component {
           </a>
           <a
             href=""
+            role="link"
             className="fiad-action"
             title="Delete"
             aria-label="Delete"
