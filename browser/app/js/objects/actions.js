@@ -54,6 +54,13 @@ export const setList = (objects) => ({
   objects,
 })
 
+// navigation helper object so tests can spy/mock navigation without touching jsdom Location
+export const navigation = {
+  navigateTo: (url) => {
+    window.location.assign(url)
+  },
+}
+
 export const resetList = () => ({
   type: RESET_LIST,
 })
@@ -351,7 +358,7 @@ export const downloadObject = (object) => {
         .CreateURLToken()
         .then((res) => {
           const url = `${window.location.origin}${minioBrowserPrefix}/download/${currentBucket}/${encObjectName}?token=${res.token}`
-          window.location = url
+          navigation.navigateTo(url)
         })
         .catch((err) => {
           dispatch(
@@ -363,7 +370,7 @@ export const downloadObject = (object) => {
         })
     } else {
       const url = `${window.location.origin}${minioBrowserPrefix}/download/${currentBucket}/${encObjectName}?token=`
-      window.location = url
+      navigation.navigateTo(url)
     }
   }
 }
