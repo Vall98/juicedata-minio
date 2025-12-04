@@ -27,7 +27,7 @@ describe("Bucket", () => {
     render(
       <MobileHeader sidebarOpen={false} toggleSidebar={toggleSidebar} />
     )
-    const toggle = screen.getByTestId("sidebar-toggle")
+    const toggle = screen.getByRole('button', { name: /toggle sidebar/i })
     fireEvent.click(toggle)
     expect(toggleSidebar).toHaveBeenCalled()
   })

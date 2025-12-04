@@ -17,13 +17,15 @@
 import { fireEvent, render, screen } from "@testing-library/react"
 import { UploadModal } from "../UploadModal"
 import { Provider } from "react-redux"
-import configureStore from "../../store/configure-store"
-
-const store = configureStore()
+import store from "../../store/store"
 
 describe("UploadModal", () => {
   it("should render without crashing", () => {
-    render(<UploadModal uploads={{}} />)
+    render(
+      <Provider store={store}>
+        <UploadModal uploads={{}} />
+      </Provider>
+    )
   })
 
   it("should render AbortConfirmModal when showAbort is true", () => {
@@ -39,27 +41,36 @@ describe("UploadModal", () => {
   })
 
   it("should render nothing when there are no files being uploaded", () => {
-    render(<UploadModal uploads={{}} />)
-    expect(document.body.innerHTML).toMatch(/^<div><noscript><\/noscript><\/div>$/);
+    render(
+      <Provider store={store}>
+        <UploadModal uploads={{}} />
+      </Provider>
+    )
+    expect(screen.queryByRole("dialog")).toBeNull()
+    expect(screen.queryByRole("progressbar")).toBeNull()
   })
 
   it("should show upload progress when one or more files are being uploaded", () => {
     render(
-      <UploadModal
-        uploads={{ "a-b/-test": { size: 100, loaded: 50, name: "test" } }}
-      />
+      <Provider store={store}>
+        <UploadModal
+          uploads={{ "a-b/-test": { size: 100, loaded: 50, name: "test" } }}
+        />
+      </Provider>
     )
     const progressbar = screen.getByRole("progressbar")
-    expect(progressbar).toHaveAttribute('aria-valuenow', '50');
+    expect(progressbar).toHaveAttribute("aria-valuenow", "50")
   })
 
   it("should call showAbortModal when close button is clicked", () => {
     const showAbortModal = jest.fn()
     render(
-      <UploadModal
-        uploads={{ "a-b/-test": { size: 100, loaded: 50, name: "test" } }}
-        showAbortModal={showAbortModal}
-      />
+      <Provider store={store}>
+        <UploadModal
+          uploads={{ "a-b/-test": { size: 100, loaded: 50, name: "test" } }}
+          showAbortModal={showAbortModal}
+        />
+      </Provider>
     )
     const btn = screen.getByRole("button", { name: "×" })
     fireEvent.click(btn)

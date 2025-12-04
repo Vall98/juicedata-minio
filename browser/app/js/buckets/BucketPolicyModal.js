@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import React from "react"
 import { connect } from "react-redux"
 import { Modal, ModalHeader } from "react-bootstrap"
 import * as actionsBuckets from "./actions"
