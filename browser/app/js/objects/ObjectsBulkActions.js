@@ -80,9 +80,9 @@ export class ObjectsBulkActions extends React.Component {
             Delete selected{" "}
           </button>
         </span>
-        <i
+        <button
+          aria-label="Close selected"
           className="la-close fas fa-times"
-          id="close-bulk-actions"
           onClick={clearChecked}
         />
         {this.state.showDeleteConfirmation && (

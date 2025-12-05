@@ -24,11 +24,9 @@ import { Router } from "react-router-dom"
 import { Provider } from "react-redux"
 
 import history from "./js/history"
-import configureStore from "./js/store/configure-store"
+import store from "./js/store/store"
 import hideLoader from "./js/loader"
 import App from "./js/App"
-
-const store = configureStore()
 
 ReactDOM.render(
   <Provider store={store}>

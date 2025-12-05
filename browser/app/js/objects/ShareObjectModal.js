@@ -108,9 +108,10 @@ export class ShareObjectModal extends React.Component {
               <label>Expires in (Max 7 days)</label>
               <div className="set-expire">
                 <div className="set-expire-item">
-                  <i
+                  <button
                     id="increase-days"
                     className="set-expire-increase"
+                    aria-label="increase days"
                     onClick={() => this.updateExpireValue("days", 1)}
                   />
                   <div className="set-expire-title">Days</div>
@@ -122,18 +123,21 @@ export class ShareObjectModal extends React.Component {
                       max={7}
                       value={this.state.expiry.days}
                       readOnly="readOnly"
+                      aria-label="expiry days"
                     />
                   </div>
-                  <i
+                  <button
                     id="decrease-days"
                     className="set-expire-decrease"
+                    aria-label="decrease days"
                     onClick={() => this.updateExpireValue("days", -1)}
                   />
                 </div>
                 <div className="set-expire-item">
-                  <i
+                  <button
                     id="increase-hours"
                     className="set-expire-increase"
+                    aria-label="increase hours"
                     onClick={() => this.updateExpireValue("hours", 1)}
                   />
                   <div className="set-expire-title">Hours</div>
@@ -145,18 +149,21 @@ export class ShareObjectModal extends React.Component {
                       max={23}
                       value={this.state.expiry.hours}
                       readOnly="readOnly"
+                      aria-label="expiry hours"
                     />
                   </div>
-                  <i
+                  <button
                     className="set-expire-decrease"
                     id="decrease-hours"
+                    aria-label="decrease hours"
                     onClick={() => this.updateExpireValue("hours", -1)}
                   />
                 </div>
                 <div className="set-expire-item">
-                  <i
+                  <button
                     id="increase-minutes"
                     className="set-expire-increase"
+                    aria-label="increase minutes"
                     onClick={() => this.updateExpireValue("minutes", 1)}
                   />
                   <div className="set-expire-title">Minutes</div>
@@ -168,11 +175,13 @@ export class ShareObjectModal extends React.Component {
                       max={59}
                       value={this.state.expiry.minutes}
                       readOnly="readOnly"
+                      aria-label="expiry minutes"
                     />
                   </div>
-                  <i
+                  <button
                     id="decrease-minutes"
                     className="set-expire-decrease"
+                    aria-label="decrease minutes"
                     onClick={() => this.updateExpireValue("minutes", -1)}
                   />
                 </div>

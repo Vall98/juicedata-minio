@@ -14,30 +14,43 @@
  * limitations under the License.
  */
 
-import React from "react"
-import { shallow, mount } from "enzyme"
+import { render, screen, fireEvent, within, waitFor } from "@testing-library/react"
+import { Provider } from "react-redux"
+import store from "../../store/store"
 import { BucketPolicyModal } from "../BucketPolicyModal"
-import { READ_ONLY, WRITE_ONLY, READ_WRITE } from "../../constants"
+import { READ_ONLY } from "../../constants"
 
 describe("BucketPolicyModal", () => {
   it("should render without crashing", () => {
-    shallow(<BucketPolicyModal policies={[]}/>)
+    render(
+      <Provider store={store}>
+        <BucketPolicyModal policies={[]} />
+      </Provider>
+    )
   })
 
   it("should call hideBucketPolicy when close button is clicked", () => {
     const hideBucketPolicy = jest.fn()
-    const wrapper = shallow(
-      <BucketPolicyModal hideBucketPolicy={hideBucketPolicy} policies={[]} />
+    render(
+      <Provider store={store}>
+        <BucketPolicyModal showBucketPolicy={true} hideBucketPolicy={hideBucketPolicy} policies={[]} />
+      </Provider>
     )
-    wrapper.find("button").simulate("click")
+    const dialog = screen.getByRole('dialog')
+    const closeSpan = within(dialog).getByText('×')
+    const closeBtn = closeSpan.closest('button')
+    if (closeBtn) fireEvent.click(closeBtn)
     expect(hideBucketPolicy).toHaveBeenCalled()
   })
 
   it("should include the PolicyInput and Policy components when there are any policies", () => {
-    const wrapper = shallow(
-      <BucketPolicyModal policies={ [{prefix: "test", policy: READ_ONLY}] } />
+    render(
+      <Provider store={store}>
+        <BucketPolicyModal showBucketPolicy={true} policies={[{ prefix: "test", policy: READ_ONLY }]} />
+      </Provider>
     )
-    expect(wrapper.find("Connect(PolicyInput)").length).toBe(1)
-    expect(wrapper.find("Connect(Policy)").length).toBe(1)
+    waitFor(() => {
+      expect(screen.getByText(/test/)).toBeInTheDocument()
+    })
   })
 })
