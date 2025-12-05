@@ -33,7 +33,7 @@ const root = createRoot(container);
 
 root.render(
   <Provider store={store}>
-    <BrowserRouter>
+    <BrowserRouter basename="/minio">
       <App />
     </BrowserRouter>
   </Provider>
