@@ -19,8 +19,8 @@ import "./scss/main.scss"
 import "@fortawesome/fontawesome-free/css/all.css"
 import "material-design-iconic-font/dist/css/material-design-iconic-font.min.css"
 
-import ReactDOM from "react-dom"
-import { Router } from "react-router-dom"
+import { createRoot } from "react-dom/client";
+import { BrowserRouter } from "react-router-dom";
 import { Provider } from "react-redux"
 
 import history from "./js/history"
@@ -28,13 +28,15 @@ import store from "./js/store/store"
 import hideLoader from "./js/loader"
 import App from "./js/App"
 
-ReactDOM.render(
+const container = document.getElementById("root");
+const root = createRoot(container);
+
+root.render(
   <Provider store={store}>
-    <Router history={history}>
+    <BrowserRouter>
       <App />
-    </Router>
-  </Provider>,
-  document.getElementById("root")
-)
+    </BrowserRouter>
+  </Provider>
+);
 
 hideLoader()
