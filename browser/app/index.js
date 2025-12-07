@@ -24,7 +24,7 @@ import { BrowserRouter } from "react-router-dom";
 import { Provider } from "react-redux"
 
 import store from "./js/store/store"
-import hideLoader from "./js/loader"
+//import hideLoader from "./js/loader"
 import App from "./js/App"
 
 const container = document.getElementById("root");
@@ -38,4 +38,4 @@ root.render(
   </Provider>
 );
 
-hideLoader()
+//hideLoader()

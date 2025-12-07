@@ -15,18 +15,26 @@
  */
 
 import { Routes, Route, useNavigate } from "react-router-dom"
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import Browser from "./browser/Browser"
 import Login from "./browser/Login"
 import OpenIDLogin from "./browser/OpenIDLogin"
 import { setNavigate } from "./navigation"
+import hideLoader from "./loader"
 
 export const App = () => {
   const navigate = useNavigate()
+  const readyRef = useRef(false)
 
   useEffect(() => {
     setNavigate(navigate)
+    readyRef.current = true
+    hideLoader()
   }, [navigate])
+
+  if (!readyRef.current) {
+    return null
+  }
 
   return (
     <Routes>

@@ -22,12 +22,12 @@ export const navigate = (location, options={}) => {
   if (navigateFn) {
     navigateFn(location, options)
   } else if (typeof window !== 'undefined') {
-    console.warn("navigate() called before router was ready")
     if (options.replace) {
       window.location.replace(location)
     } else {
       window.location.href = location
     }
+    console.warn("navigate() called before router was ready")
   } else {
     console.warn("navigate() called in non-browser environment")
   }

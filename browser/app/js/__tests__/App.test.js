@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { render, screen } from "@testing-library/react"
+import { render, screen, waitFor } from "@testing-library/react"
 import { MemoryRouter } from "react-router-dom"
 import App from "../App"
 
@@ -36,7 +36,7 @@ describe("App", () => {
         <App />
       </MemoryRouter>
     )
-    expect(screen.getByText(/^Login$/)).toBeInTheDocument()
+    waitFor(() => expect(screen.getByText(/^Login$/)).toBeInTheDocument())
   })
 
   it("should render Browser component for '/' route", () => {
@@ -45,7 +45,7 @@ describe("App", () => {
         <App />
       </MemoryRouter>
     )
-    expect(screen.getByText(/^Browser$/)).toBeInTheDocument()
+    waitFor(() => expect(screen.getByText(/^Browser$/)).toBeInTheDocument())
   })
 
   it("should render Browser component for '/bucket' route", () => {
@@ -54,7 +54,7 @@ describe("App", () => {
         <App />
       </MemoryRouter>
     )
-    expect(screen.getByText(/^Browser$/)).toBeInTheDocument()
+    waitFor(() => expect(screen.getByText(/^Browser$/)).toBeInTheDocument())
   })
 
   it("should render Browser component for '/bucket/a/b/c' route", () => {
@@ -63,6 +63,6 @@ describe("App", () => {
         <App />
       </MemoryRouter>
     )
-    expect(screen.getByText(/^Browser$/)).toBeInTheDocument()
+    waitFor(() => expect(screen.getByText(/^Browser$/)).toBeInTheDocument())
   })
 })
