@@ -16,7 +16,6 @@
 
 import { configureStore } from "@reduxjs/toolkit"
 import * as actionsBuckets from "../actions"
-import history from "../../history"
 import alertReducer from "../../alert/reducer"
 import bucketsReducer from "../reducer"
 
@@ -31,6 +30,10 @@ jest.mock("../../web", () => ({
     return Promise.resolve()
   })
 }))
+/*
+jest.mock("../../navigation", () => ({
+  navigate: jest.fn()
+}))*/
 
 jest.mock("../../objects/actions", () => ({
   selectPrefix: () => dispatch => { }
@@ -61,7 +64,7 @@ describe("Buckets actions", () => {
   })
 
   it("creates buckets/SET_CURRENT_BUCKET with bucket name in the url after fetching buckets", () => {
-    history.push("/test2")
+    window.history.pushState({}, "", "/test2");
     const expectedState = {
       currentBucket: "test2",
       filter: "",
@@ -77,7 +80,7 @@ describe("Buckets actions", () => {
   })
 
   it("creates buckets/SET_CURRENT_BUCKET with first bucket when the bucket in url is not exists after fetching buckets", () => {
-    history.push("/test3")
+    window.history.pushState({}, "", "/test3");
     const expectedState = {
       currentBucket: "test1",
       filter: "",

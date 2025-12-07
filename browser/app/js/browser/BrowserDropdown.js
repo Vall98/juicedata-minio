@@ -19,7 +19,7 @@ import { connect } from "react-redux"
 import { Dropdown } from "react-bootstrap"
 import * as browserActions from "./actions"
 import web from "../web"
-import history from "../history"
+import { navigate } from "../navigation"
 import AboutModal from "./AboutModal"
 import ChangePasswordModal from "./ChangePasswordModal"
 
@@ -60,7 +60,7 @@ export class BrowserDropdown extends React.Component {
   logout(e) {
     e.preventDefault()
     web.Logout()
-    history.replace("/login")
+    navigate("/login", { replace: true });
   }
   render() {
     const { serverInfo } = this.props

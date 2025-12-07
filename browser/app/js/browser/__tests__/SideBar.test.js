@@ -70,7 +70,7 @@ describe("SideBar", () => {
         <SideBar clickOutside={clickOutside} />
       </Provider>
     )
-    const toggle = screen.getByRole('button')
+    const toggle = screen.getByRole('heading')
     fireEvent.click(toggle)
     expect(clickOutside).not.toHaveBeenCalled()
   })

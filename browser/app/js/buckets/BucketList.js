@@ -22,7 +22,7 @@ import * as actionsBuckets from "./actions"
 import { getFilteredBuckets } from "./selectors"
 import BucketContainer from "./BucketContainer"
 import web from "../web"
-import history from "../history"
+import { navigate } from "../navigation"
 import { pathSlice } from "../utils"
 
 export class BucketList extends React.Component {
@@ -40,17 +40,17 @@ export class BucketList extends React.Component {
       })
     }
   }
-  componentWillMount() {
+  componentDidMount() {
     const { fetchBuckets, setBucketList, selectBucket } = this.props
     if (web.LoggedIn()) {
       fetchBuckets()
     } else {
-      const { bucket, prefix } = pathSlice(history.location.pathname)
+      const { bucket, prefix } = pathSlice(window.location.pathname)
       if (bucket) {
         setBucketList([bucket])
         selectBucket(bucket, prefix)
       } else {
-        history.replace("/login")
+        navigate("/login", { replace: true })
       }
     }
   }
@@ -65,7 +65,7 @@ export class BucketList extends React.Component {
     return (
       <div className="fesl-inner">
         <Scrollbars
-          renderTrackVertical={props => <div className="scrollbar-vertical" />}
+          renderTrackVertical={() => <div className="scrollbar-vertical" />}
         >
           <InfiniteScroll
             pageStart={0}

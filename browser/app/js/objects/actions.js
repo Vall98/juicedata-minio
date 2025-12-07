@@ -15,7 +15,7 @@
  */
 
 import web from "../web"
-import history from "../history"
+import { navigate } from "../navigation"
 import {
   sortObjectsByName,
   sortObjectsBySize,
@@ -130,7 +130,7 @@ export const fetchObjects = () => {
             )
             dispatch(resetList())
           } else {
-            history.push("/login")
+            navigate("/login")
           }
           dispatch(setListLoading(false))
         })
@@ -180,7 +180,7 @@ export const selectPrefix = (prefix) => {
     dispatch(fetchObjects())
     dispatch(resetCheckedList())
     const currentBucket = getCurrentBucket(getState())
-    history.replace(`/${currentBucket}/${prefix}`)
+    navigate(`/${currentBucket}/${prefix}`, { replace: true })
   }
 }
 

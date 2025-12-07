@@ -21,6 +21,7 @@ import Alert from "../alert/Alert"
 import * as actionsAlert from "../alert/actions"
 import InputGroup from "./InputGroup"
 import web from "../web"
+import { navigate } from "../navigation"
 import { Navigate, Link } from "react-router-dom"
 import OpenIDLoginButton from './OpenIDLoginButton'
 
@@ -31,8 +32,7 @@ export class Login extends React.Component {
       accessKey: "",
       secretKey: "",
       discoveryDoc: {},
-      clientId: "",
-      redirectToHome: false
+      clientId: ""
     }
   }
 
@@ -72,8 +72,7 @@ export class Login extends React.Component {
         // Clear alerts from previous login attempts
         clearAlert()
 
-        // Use Navigate component for navigation instead of history.push
-        this.setState({ redirectToHome: true })
+        navigate("/")
       })
       .catch(e => {
         showAlert("danger", e.message)
@@ -100,8 +99,8 @@ export class Login extends React.Component {
 
   render() {
     const { clearAlert, alert } = this.props
-    if (web.LoggedIn() || this.state.redirectToHome) {
-      return <Navigate to={"/"} />
+    if (web.LoggedIn()) {
+      return <Navigate to="/" />
     }
     let alertBox = <Alert {...alert} onDismiss={clearAlert} />
     // Make sure you don't show a fading out alert box on the initial web-page load.

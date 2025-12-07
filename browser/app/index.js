@@ -23,7 +23,6 @@ import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import { Provider } from "react-redux"
 
-import history from "./js/history"
 import store from "./js/store/store"
 import hideLoader from "./js/loader"
 import App from "./js/App"

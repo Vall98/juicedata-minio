@@ -15,7 +15,6 @@
  */
 
 import { render } from "@testing-library/react"
-import history from "../../history"
 import { BucketList } from "../BucketList"
 
 jest.mock("../../web", () => ({
@@ -42,7 +41,7 @@ describe("BucketList", () => {
   it("should call setBucketList and selectBucket before component is mounted when the user has not loggedIn", () => {
     const setBucketList = jest.fn()
     const selectBucket = jest.fn()
-    history.push("/bk1/pre1")
+    window.history.pushState({}, "", "/bk1/pre1");
     render(
       <BucketList
         filteredBuckets={[]}

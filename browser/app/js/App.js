@@ -14,12 +14,20 @@
  * limitations under the License.
  */
 
-import { Routes, Route } from "react-router-dom"
+import { Routes, Route, useNavigate } from "react-router-dom"
+import { useEffect } from 'react'
 import Browser from "./browser/Browser"
 import Login from "./browser/Login"
 import OpenIDLogin from "./browser/OpenIDLogin"
+import { setNavigate } from "./navigation"
 
 export const App = () => {
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    setNavigate(navigate)
+  }, [navigate])
+
   return (
     <Routes>
       <Route path={"/login/openid"} element={<OpenIDLogin />} />

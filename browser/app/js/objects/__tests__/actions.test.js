@@ -23,11 +23,15 @@ import {
   SORT_BY_NAME,
   SORT_ORDER_DESC
 } from "../../constants"
-import history from "../../history"
 import alertReducer from "../../alert/reducer"
 import browserReducer from "../../browser/reducer"
 import bucketsReducer from "../../buckets/reducer"
 import objectsReducer from "../reducer"
+import { navigate } from "../../navigation"
+
+jest.mock("../../navigation", () => ({
+  navigate: jest.fn()
+}))
 
 jest.mock("../../web", () => ({
   LoggedIn: jest
@@ -96,7 +100,7 @@ describe("Objects actions", () => {
     });
   })
 
-            it("creates objects/SET_LIST action", () => {
+  it("creates objects/SET_LIST action", () => {
     store.dispatch(
       objectsActions.setList([{ name: "test1" }, { name: "test2" }])
     )
@@ -214,7 +218,7 @@ describe("Objects actions", () => {
     store.dispatch(bucketsActions.setCurrentBucket("test-deny"))
     store.dispatch(objectsActions.setCurrentPrefix(""))
     return store.dispatch(objectsActions.fetchObjects()).then(() => {
-      expect(history.location.pathname.endsWith("/login")).toBeTruthy()
+      expect(navigate).toHaveBeenCalledWith("/login");
     })
   })
 
@@ -261,7 +265,7 @@ describe("Objects actions", () => {
       sortBy: "",
       sortOrder: "asc"
     })
-    expect(window.location.pathname.endsWith("/test/abc/")).toBeTruthy()
+    expect(navigate).toHaveBeenCalledWith("/test/abc/", { replace: true });
   })
 
   it("create objects/SET_PREFIX_WRITABLE action", () => {

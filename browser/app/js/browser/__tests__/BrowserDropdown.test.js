@@ -16,6 +16,11 @@
 
 import { fireEvent, render, screen } from "@testing-library/react"
 import { BrowserDropdown } from "../BrowserDropdown"
+import { navigate } from "../../navigation"
+
+jest.mock("../../navigation", () => ({
+  navigate: jest.fn()
+}))
 
 describe("BrowserDropdown", () => {
   const serverInfo = {
@@ -62,6 +67,6 @@ describe("BrowserDropdown", () => {
     fireEvent.click(dropdownButton)
     const logout = screen.getByText(/logout/i);
     fireEvent.click(logout)
-    expect(window.location.pathname.endsWith("/login")).toBeTruthy()
+    expect(navigate).toHaveBeenCalledWith("/login", { replace: true });
   })
 })
