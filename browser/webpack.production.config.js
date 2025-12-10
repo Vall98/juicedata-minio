@@ -31,7 +31,7 @@ var exports = {
     filename: 'index_bundle.js'
   },
   resolve: {
-    fallback: { path: false }
+    fallback: { path: require.resolve('path-browserify') }
   },
   module: {
     rules: [{
