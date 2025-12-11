@@ -159,7 +159,7 @@ select.form-control {
     }
     &:after {
         content: "\f05a";
-        font-family: 'Font Awesome 5 Free';
+        font-family: $font-family-icon;
         position: absolute;
         top: 17px;
         right: 9px;

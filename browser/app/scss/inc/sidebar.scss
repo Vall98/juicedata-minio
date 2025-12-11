@@ -79,7 +79,7 @@
 			word-wrap: break-word;
 
 			&:before {
-				font-family: 'Font Awesome 5 Free';
+				font-family: $font-family-icon;
 				content: '\f0a0';
 				font-size: 17px;
 				position: absolute;

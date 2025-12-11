@@ -58,10 +58,9 @@ var exports = {
         loader: 'css-loader'
       }]
     }, {
-      test: /\.(eot|woff|woff2|ttf|svg|png)/,
-      use: [{
-        loader: 'url-loader'
-      }]
+      test: /\.(eot|woff|woff2|ttf|svg|png)$/,
+      type: 'asset/resource',
+      generator: { filename: 'assets/[name].[contenthash][ext]' }
     }]
   },
   devServer: {
