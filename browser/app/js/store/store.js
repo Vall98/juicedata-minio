@@ -14,8 +14,12 @@
  * limitations under the License.
  */
 
-import "jest-enzyme"
-import { configure } from "enzyme"
-import Adapter from "enzyme-adapter-react-16"
+import { configureStore } from "@reduxjs/toolkit"
+import reducers from "../reducers"
 
-configure({ adapter: new Adapter() })
+const store = configureStore({
+  reducer: reducers,
+  middleware: (getDefaultMiddleware) => getDefaultMiddleware(),
+});
+
+export default store

@@ -14,23 +14,19 @@
  * limitations under the License.
  */
 
-import React from "react"
-import { shallow, mount } from "enzyme"
+import { render, screen, fireEvent } from "@testing-library/react"
 import { BucketDropdown } from "../BucketDropdown"
 
 describe("BucketDropdown", () => {
   it("should render without crashing", () => {
-    shallow(<BucketDropdown />)
+    render(<BucketDropdown />)
   })
 
   it("should call toggleDropdown on dropdown toggle", () => {
-    const spy = jest.spyOn(BucketDropdown.prototype, 'toggleDropdown')
-    const wrapper = shallow(
-      <BucketDropdown />
-    )
-    wrapper
-      .find("Uncontrolled(Dropdown)")
-      .simulate("toggle")
+    const spy = jest.spyOn(BucketDropdown.prototype, "toggleDropdown")
+    render(<BucketDropdown />)
+    const toggle = screen.getByRole("button")
+    fireEvent.click(toggle)
     expect(spy).toHaveBeenCalled()
     spy.mockReset()
     spy.mockRestore()
@@ -38,25 +34,25 @@ describe("BucketDropdown", () => {
 
   it("should call showBucketPolicy when Edit Policy link is clicked", () => {
     const showBucketPolicy = jest.fn()
-    const wrapper = shallow(
+    render(
       <BucketDropdown showBucketPolicy={showBucketPolicy} />
     )
-    wrapper
-      .find("li a")
-      .at(0)
-      .simulate("click", { stopPropagation: jest.fn() })
+    const toggle = screen.getByRole("button")
+    fireEvent.click(toggle)
+    const editPolicy = screen.getByText("Edit policy")
+    fireEvent.click(editPolicy)
     expect(showBucketPolicy).toHaveBeenCalled()
   })
 
   it("should call deleteBucket when Delete link is clicked", () => {
     const deleteBucket = jest.fn()
-    const wrapper = shallow(
+    render(
       <BucketDropdown bucket={"test"} deleteBucket={deleteBucket} />
     )
-    wrapper
-      .find("li a")
-      .at(1)
-      .simulate("click", { stopPropagation: jest.fn() })
+    const toggle = screen.getByRole("button")
+    fireEvent.click(toggle)
+    const deletePolicy = screen.getByText("Delete")
+    fireEvent.click(deletePolicy)
     expect(deleteBucket).toHaveBeenCalledWith("test")
   })
 })

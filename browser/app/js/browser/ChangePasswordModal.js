@@ -18,7 +18,7 @@ import React from "react"
 import { connect } from "react-redux"
 import web from "../web"
 import * as alertActions from "../alert/actions"
-import { getRandomAccessKey, getRandomSecretKey } from "../utils"
+import { getRandomSecretKey } from "../utils"
 import jwtDecode from "jwt-decode"
 import classNames from "classnames"
 
@@ -89,7 +89,7 @@ export class ChangePasswordModal extends React.Component {
   canChangePassword() {
     const { serverInfo } = this.props
     // Password change is not allowed for temporary users(STS)
-    if(serverInfo.userInfo.isTempUser) {
+    if (serverInfo.userInfo.isTempUser) {
       return false
     }
 
@@ -116,7 +116,7 @@ export class ChangePasswordModal extends React.Component {
 
     if (!allowChangePassword) {
       return (
-        <Modal bsSize="sm" animation={false} show={true}>
+        <Modal size="sm" animation={false} show={true}>
           <ModalHeader>Change Password</ModalHeader>
           <ModalBody>
             Credentials of this user cannot be updated through MinIO Browser.
@@ -135,7 +135,7 @@ export class ChangePasswordModal extends React.Component {
     }
 
     return (
-      <Modal bsSize="sm" animation={false} show={true}>
+      <Modal size="sm" animation={false} show={true}>
         <ModalHeader>Change Password</ModalHeader>
         <ModalBody className="m-t-20">
           <div className="has-toggle-password">
@@ -204,9 +204,6 @@ export class ChangePasswordModal extends React.Component {
               required="required"
               autoComplete="false"
               align="ig-left"
-              onChange={e => {
-                this.setState({ newSecretKey: e.target.value })
-              }}
             />
           </div>
         </ModalBody>

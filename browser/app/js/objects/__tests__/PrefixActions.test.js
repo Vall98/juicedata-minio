@@ -14,71 +14,71 @@
  * limitations under the License.
  */
 
-import React from "react"
-import { shallow } from "enzyme"
+import { render, fireEvent, screen, within } from "@testing-library/react"
 import { PrefixActions } from "../PrefixActions"
 
 describe("PrefixActions", () => {
   it("should render without crashing", () => {
-    shallow(<PrefixActions object={{ name: "abc/" }} currentPrefix={"pre1/"} />)
+    render(<PrefixActions object={{ name: "abc/" }} currentPrefix={"pre1/"} />)
   })
 
   it("should show DeleteObjectConfirmModal when delete action is clicked", () => {
-    const wrapper = shallow(
+    render(
       <PrefixActions object={{ name: "abc/" }} currentPrefix={"pre1/"} />
     )
-    wrapper
-      .find("a")
-      .last()
-      .simulate("click", { preventDefault: jest.fn() })
-    expect(wrapper.state("showDeleteConfirmation")).toBeTruthy()
-    expect(wrapper.find("DeleteObjectConfirmModal").length).toBe(1)
+    const toggle = screen.getByRole('button', { name: /object actions for abc\//i })
+    fireEvent.click(toggle)
+    const deleteLink = screen.getByTitle('Delete')
+    fireEvent.click(deleteLink)
+    expect(screen.getByRole('dialog')).toBeInTheDocument()
   })
 
   it("should hide DeleteObjectConfirmModal when Cancel button is clicked", () => {
-    const wrapper = shallow(
+    render(
       <PrefixActions object={{ name: "abc/" }} currentPrefix={"pre1/"} />
     )
-    wrapper
-      .find("a")
-      .last()
-      .simulate("click", { preventDefault: jest.fn() })
-    wrapper.find("DeleteObjectConfirmModal").prop("hideDeleteConfirmModal")()
-    wrapper.update()
-    expect(wrapper.state("showDeleteConfirmation")).toBeFalsy()
-    expect(wrapper.find("DeleteObjectConfirmModal").length).toBe(0)
+    const toggle = screen.getByRole('button', { name: /object actions for abc\//i })
+    fireEvent.click(toggle)
+    const deleteLink = screen.getByTitle('Delete')
+    fireEvent.click(deleteLink)
+    const dialog = screen.getByRole('dialog')
+    const cancel = within(dialog).getByText(/Cancel/i)
+    fireEvent.click(cancel)
+    expect(screen.queryByRole('dialog')).toBeNull()
   })
 
   it("should call deleteObject with object name", () => {
     const deleteObject = jest.fn()
-    const wrapper = shallow(
+    render(
       <PrefixActions
         object={{ name: "abc/" }}
         currentPrefix={"pre1/"}
         deleteObject={deleteObject}
       />
     )
-    wrapper
-      .find("a")
-      .last()
-      .simulate("click", { preventDefault: jest.fn() })
-    wrapper.find("DeleteObjectConfirmModal").prop("deleteObject")()
+    const toggle = screen.getByRole('button', { name: /object actions for abc\//i })
+    fireEvent.click(toggle)
+    const deleteLink = screen.getByTitle('Delete')
+    fireEvent.click(deleteLink)
+    const dialog = screen.getByRole('dialog')
+    const delBtn = within(dialog).getByRole('button', { name: /delete/i })
+    fireEvent.click(delBtn)
     expect(deleteObject).toHaveBeenCalledWith("abc/")
   })
 
 
   it("should call downloadPrefix when single object is selected and download button is clicked", () => {
     const downloadPrefix = jest.fn()
-    const wrapper = shallow(
+    render(
       <PrefixActions
         object={{ name: "abc/" }}
         currentPrefix={"pre1/"}
         downloadPrefix={downloadPrefix} />
     )
-    wrapper
-      .find("a")
-      .first()
-      .simulate("click", { preventDefault: jest.fn() })
+    const toggle = screen.getByRole('button', { name: /object actions for abc\//i })
+    fireEvent.click(toggle)
+    const downloadLink = screen.getByTitle('Download as zip')
+    fireEvent.click(downloadLink)
     expect(downloadPrefix).toHaveBeenCalled()
   })
 })

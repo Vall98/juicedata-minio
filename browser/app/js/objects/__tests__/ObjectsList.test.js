@@ -14,26 +14,37 @@
  * limitations under the License.
  */
 
-import React from "react"
-import { shallow } from "enzyme"
+import { render, screen } from "@testing-library/react"
+import { Provider } from "react-redux"
 import { ObjectsList } from "../ObjectsList"
+import store from "../../store/store"
 
 describe("ObjectsList", () => {
   it("should render without crashing", () => {
-    shallow(<ObjectsList objects={[]} />)
+    render(
+      <Provider store={store}>
+        <ObjectsList objects={[]} />
+      </Provider>
+    )
   })
 
   it("should render ObjectContainer for every object", () => {
-    const wrapper = shallow(
-      <ObjectsList objects={[{ name: "test1.jpg" }, { name: "test2.jpg" }]} />
+    render(
+      <Provider store={store}>
+        <ObjectsList objects={[{ name: "test1.jpg" }, { name: "test2.jpg" }]} />
+      </Provider>
     )
-    expect(wrapper.find("Connect(ObjectContainer)").length).toBe(2)
+    expect(screen.getByText("test1.jpg")).toBeInTheDocument()
+    expect(screen.getByText("test2.jpg")).toBeInTheDocument()
   })
 
   it("should render PrefixContainer for every prefix", () => {
-    const wrapper = shallow(
-      <ObjectsList objects={[{ name: "abc/" }, { name: "xyz/" }]} />
+    render(
+      <Provider store={store}>
+        <ObjectsList objects={[{ name: "abc/" }, { name: "xyz/" }]} />
+      </Provider>
     )
-    expect(wrapper.find("Connect(PrefixContainer)").length).toBe(2)
+    expect(screen.getByText("abc/")).toBeInTheDocument()
+    expect(screen.getByText("xyz/")).toBeInTheDocument()
   })
 })

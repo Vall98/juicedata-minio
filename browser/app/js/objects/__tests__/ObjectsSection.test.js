@@ -14,12 +14,17 @@
  * limitations under the License.
  */
 
-import React from "react"
-import { shallow } from "enzyme"
+import { render } from "@testing-library/react"
+import { Provider } from "react-redux"
 import { ObjectsSection } from "../ObjectsSection"
+import store from "../../store/store"
 
 describe("ObjectsSection", () => {
   it("should render without crashing", () => {
-    shallow(<ObjectsSection />)
+    render(
+      <Provider store={store}>
+        <ObjectsSection />
+      </Provider>
+    )
   })
 })

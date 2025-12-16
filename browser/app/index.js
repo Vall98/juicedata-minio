@@ -14,30 +14,28 @@
  * limitations under the License.
  */
 
-import "babel-polyfill"
-import "./less/main.less"
+import "core-js/stable";
+import "./scss/main.scss"
 import "@fortawesome/fontawesome-free/css/all.css"
 import "material-design-iconic-font/dist/css/material-design-iconic-font.min.css"
 
-import React from "react"
-import ReactDOM from "react-dom"
-import { Router, Route } from "react-router-dom"
+import { createRoot } from "react-dom/client";
+import { BrowserRouter } from "react-router-dom";
 import { Provider } from "react-redux"
 
-import history from "./js/history"
-import configureStore from "./js/store/configure-store"
-import hideLoader from "./js/loader"
+import store from "./js/store/store"
+//import hideLoader from "./js/loader"
 import App from "./js/App"
 
-const store = configureStore()
+const container = document.getElementById("root");
+const root = createRoot(container);
 
-ReactDOM.render(
+root.render(
   <Provider store={store}>
-    <Router history={history}>
+    <BrowserRouter basename="/minio">
       <App />
-    </Router>
-  </Provider>,
-  document.getElementById("root")
-)
+    </BrowserRouter>
+  </Provider>
+);
 
-hideLoader()
+//hideLoader()

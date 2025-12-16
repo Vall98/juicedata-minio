@@ -82,12 +82,14 @@ export class ObjectActions extends React.Component {
     const { object, showShareObjectModal, shareObjectName } = this.props
     return (
       <Dropdown id={`obj-actions-${object.name}`}>
-        <Dropdown.Toggle noCaret className="fia-toggle" />
+        <Dropdown.Toggle className="fia-toggle" />
         <Dropdown.Menu>
           <a
             href=""
+            role="link"
             className="fiad-action"
             title="Share"
+            aria-label="Share"
             onClick={this.shareObject.bind(this)}
           >
             <i className="fas fa-share-alt" />
@@ -95,8 +97,10 @@ export class ObjectActions extends React.Component {
           {getDataType(object.name, object.contentType) == "image" && (
             <a
               href=""
+              role="link"
               className="fiad-action"
               title="Preview"
+              aria-label="Preview"
               onClick={this.showPreviewModal.bind(this)}
             >
               <i className="far fa-file-image" />
@@ -104,16 +108,20 @@ export class ObjectActions extends React.Component {
           )}
           <a
             href=""
+            role="link"
             className="fiad-action"
             title="Download"
+            aria-label="Download"
             onClick={this.handleDownload.bind(this)}
           >
             <i className="fas fa-cloud-download-alt" />
           </a>
           <a
             href=""
+            role="link"
             className="fiad-action"
             title="Delete"
+            aria-label="Delete"
             onClick={this.showDeleteConfirmModal.bind(this)}
           >
             <i className="fas fa-trash-alt" />

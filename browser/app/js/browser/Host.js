@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-import React from "react"
-
 export const Host = () => (
   <div className="fes-host">
     <i className="fas fa-globe-americas" />

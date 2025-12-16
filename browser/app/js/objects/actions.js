@@ -15,7 +15,7 @@
  */
 
 import web from "../web"
-import history from "../history"
+import { navigate } from "../navigation"
 import {
   sortObjectsByName,
   sortObjectsBySize,
@@ -53,6 +53,13 @@ export const setList = (objects) => ({
   type: SET_LIST,
   objects,
 })
+
+// navigation helper object so tests can spy/mock navigation without touching jsdom Location
+export const navigation = {
+  navigateTo: (url) => {
+    window.location.assign(url)
+  },
+}
 
 export const resetList = () => ({
   type: RESET_LIST,
@@ -123,7 +130,7 @@ export const fetchObjects = () => {
             )
             dispatch(resetList())
           } else {
-            history.push("/login")
+            navigate("/login")
           }
           dispatch(setListLoading(false))
         })
@@ -173,7 +180,7 @@ export const selectPrefix = (prefix) => {
     dispatch(fetchObjects())
     dispatch(resetCheckedList())
     const currentBucket = getCurrentBucket(getState())
-    history.replace(`/${currentBucket}/${prefix}`)
+    navigate(`/${currentBucket}/${prefix}`, { replace: true })
   }
 }
 
@@ -351,7 +358,7 @@ export const downloadObject = (object) => {
         .CreateURLToken()
         .then((res) => {
           const url = `${window.location.origin}${minioBrowserPrefix}/download/${currentBucket}/${encObjectName}?token=${res.token}`
-          window.location = url
+          navigation.navigateTo(url)
         })
         .catch((err) => {
           dispatch(
@@ -363,7 +370,7 @@ export const downloadObject = (object) => {
         })
     } else {
       const url = `${window.location.origin}${minioBrowserPrefix}/download/${currentBucket}/${encObjectName}?token=`
-      window.location = url
+      navigation.navigateTo(url)
     }
   }
 }

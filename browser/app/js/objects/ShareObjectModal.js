@@ -85,12 +85,12 @@ export class ShareObjectModal extends React.Component {
         show={true}
         animation={false}
         onHide={hideShareObject}
-        bsSize="small"
+        size="small"
       >
         <ModalHeader>Share Object</ModalHeader>
         <ModalBody>
           <div className="input-group copy-text">
-            <QRCode value={url} size={128}/>
+            <QRCode value={url} size={128} />
             <label>Shareable Link</label>
             <input
               type="text"
@@ -102,82 +102,91 @@ export class ShareObjectModal extends React.Component {
           </div>
           {shareObjectDetails.showExpiryDate && (
             <div
-            className="input-group"
-            style={{ display: web.LoggedIn() ? "block" : "none" }}
-          >
-            <label>Expires in (Max 7 days)</label>
-            <div className="set-expire">
-              <div className="set-expire-item">
-                <i
-                  id="increase-days"
-                  className="set-expire-increase"
-                  onClick={() => this.updateExpireValue("days", 1)}
-                />
-                <div className="set-expire-title">Days</div>
-                <div className="set-expire-value">
-                  <input
-                    ref="expireDays"
-                    type="number"
-                    min={0}
-                    max={7}
-                    value={this.state.expiry.days}
-                    readOnly="readOnly"
+              className="input-group"
+              style={{ display: web.LoggedIn() ? "block" : "none" }}
+            >
+              <label>Expires in (Max 7 days)</label>
+              <div className="set-expire">
+                <div className="set-expire-item">
+                  <button
+                    id="increase-days"
+                    className="set-expire-increase"
+                    aria-label="increase days"
+                    onClick={() => this.updateExpireValue("days", 1)}
+                  />
+                  <div className="set-expire-title">Days</div>
+                  <div className="set-expire-value">
+                    <input
+                      ref="expireDays"
+                      type="number"
+                      min={0}
+                      max={7}
+                      value={this.state.expiry.days}
+                      readOnly="readOnly"
+                      aria-label="expiry days"
+                    />
+                  </div>
+                  <button
+                    id="decrease-days"
+                    className="set-expire-decrease"
+                    aria-label="decrease days"
+                    onClick={() => this.updateExpireValue("days", -1)}
                   />
                 </div>
-                <i
-                  id="decrease-days"
-                  className="set-expire-decrease"
-                  onClick={() => this.updateExpireValue("days", -1)}
-                />
-              </div>
-              <div className="set-expire-item">
-                <i
-                  id="increase-hours"
-                  className="set-expire-increase"
-                  onClick={() => this.updateExpireValue("hours", 1)}
-                />
-                <div className="set-expire-title">Hours</div>
-                <div className="set-expire-value">
-                  <input
-                    ref="expireHours"
-                    type="number"
-                    min={0}
-                    max={23}
-                    value={this.state.expiry.hours}
-                    readOnly="readOnly"
+                <div className="set-expire-item">
+                  <button
+                    id="increase-hours"
+                    className="set-expire-increase"
+                    aria-label="increase hours"
+                    onClick={() => this.updateExpireValue("hours", 1)}
+                  />
+                  <div className="set-expire-title">Hours</div>
+                  <div className="set-expire-value">
+                    <input
+                      ref="expireHours"
+                      type="number"
+                      min={0}
+                      max={23}
+                      value={this.state.expiry.hours}
+                      readOnly="readOnly"
+                      aria-label="expiry hours"
+                    />
+                  </div>
+                  <button
+                    className="set-expire-decrease"
+                    id="decrease-hours"
+                    aria-label="decrease hours"
+                    onClick={() => this.updateExpireValue("hours", -1)}
                   />
                 </div>
-                <i
-                  className="set-expire-decrease"
-                  id="decrease-hours"
-                  onClick={() => this.updateExpireValue("hours", -1)}
-                />
-              </div>
-              <div className="set-expire-item">
-                <i
-                  id="increase-minutes"
-                  className="set-expire-increase"
-                  onClick={() => this.updateExpireValue("minutes", 1)}
-                />
-                <div className="set-expire-title">Minutes</div>
-                <div className="set-expire-value">
-                  <input
-                    ref="expireMins"
-                    type="number"
-                    min={0}
-                    max={59}
-                    value={this.state.expiry.minutes}
-                    readOnly="readOnly"
+                <div className="set-expire-item">
+                  <button
+                    id="increase-minutes"
+                    className="set-expire-increase"
+                    aria-label="increase minutes"
+                    onClick={() => this.updateExpireValue("minutes", 1)}
+                  />
+                  <div className="set-expire-title">Minutes</div>
+                  <div className="set-expire-value">
+                    <input
+                      ref="expireMins"
+                      type="number"
+                      min={0}
+                      max={59}
+                      value={this.state.expiry.minutes}
+                      readOnly="readOnly"
+                      aria-label="expiry minutes"
+                    />
+                  </div>
+                  <button
+                    id="decrease-minutes"
+                    className="set-expire-decrease"
+                    aria-label="decrease minutes"
+                    onClick={() => this.updateExpireValue("minutes", -1)}
                   />
                 </div>
-                <i
-                  id="decrease-minutes"
-                  className="set-expire-decrease"
-                  onClick={() => this.updateExpireValue("minutes", -1)}
-                />
               </div>
             </div>
-          </div>
           )}
         </ModalBody>
         <div className="modal-footer">

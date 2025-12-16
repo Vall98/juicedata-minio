@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-import React from "react"
 import classNames from "classnames"
-import ClickOutHandler from "react-onclickout"
+import ClickOutHandler from "../components/ClickOutHandler"
 import { connect } from "react-redux"
 
 import logo from "../../img/logo.svg"

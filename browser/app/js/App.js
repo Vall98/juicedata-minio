@@ -14,20 +14,34 @@
  * limitations under the License.
  */
 
-import React from "react"
-import { Route, Switch, Redirect } from "react-router-dom"
+import { Routes, Route, useNavigate } from "react-router-dom"
+import { useEffect, useState } from 'react'
 import Browser from "./browser/Browser"
 import Login from "./browser/Login"
 import OpenIDLogin from "./browser/OpenIDLogin"
-import web from "./web"
+import { setNavigate } from "./navigation"
+import hideLoader from "./loader"
 
 export const App = () => {
+  const navigate = useNavigate()
+  const [ready, setReady] = useState(false)
+
+  useEffect(() => {
+    setNavigate(navigate)
+    setReady(true)
+    hideLoader()
+  }, [navigate])
+
+  if (!ready) {
+    return null
+  }
+
   return (
-    <Switch>
-      <Route path={"/login/openid"} component={OpenIDLogin} />
-      <Route path={"/login"} component={Login} />
-      <Route path={"/:bucket?/*"} component={Browser} />
-    </Switch>
+    <Routes>
+      <Route path={"/login/openid"} element={<OpenIDLogin />} />
+      <Route path={"/login"} element={<Login />} />
+      <Route path={"/:bucket?/*"} element={<Browser />} />
+    </Routes>
   )
 }
 

@@ -1,6 +1,4 @@
 /*
- * MinIO Cloud Storage (C) 2018 MinIO, Inc.
- *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,13 +12,23 @@
  * limitations under the License.
  */
 
-import { createStore, applyMiddleware } from "redux"
-import thunkMiddleware from "redux-thunk"
-import reducers from "../reducers"
+let navigateFn
 
-const createStoreWithMiddleware = applyMiddleware(thunkMiddleware)(createStore)
+export const setNavigate = (navigate) => {
+  navigateFn = navigate
+}
 
-export default function configureStore(initialState) {
-  const store = createStoreWithMiddleware(reducers, initialState)
-  return store
+export const navigate = (location, options={}) => {
+  if (navigateFn) {
+    navigateFn(location, options)
+  } else if (typeof window !== 'undefined') {
+    if (options.replace) {
+      window.location.replace(location)
+    } else {
+      window.location.href = location
+    }
+    console.warn("navigate() called before router was ready")
+  } else {
+    console.warn("navigate() called in non-browser environment")
+  }
 }

@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import React from "react"
 import classNames from "classnames"
 import { connect } from "react-redux"
 import logo from "../../img/logo.svg"
@@ -24,6 +23,8 @@ export const MobileHeader = ({ sidebarOpen, toggleSidebar }) => (
   <header className="fe-header-mobile hidden-lg hidden-md">
     <div
       id="sidebar-toggle"
+      role="button"
+      aria-label="Toggle sidebar"
       className={
         "feh-trigger " +
         classNames({

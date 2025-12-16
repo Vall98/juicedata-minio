@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import React from "react"
 import MobileHeader from "./MobileHeader"
 import Header from "./Header"
 import ObjectsSection from "../objects/ObjectsSection"

@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-import createHistory from "history/createBrowserHistory"
+import { createBrowserHistory } from "history"
 import { minioBrowserPrefix } from "./constants"
 
-const history = createHistory({
+const history = createBrowserHistory({
   basename: minioBrowserPrefix
 })
 

@@ -14,22 +14,21 @@
  * limitations under the License.
  */
 
-import React from "react"
-import { shallow } from "enzyme"
+import { render } from "@testing-library/react"
 import { StorageInfo } from "../StorageInfo"
 
 describe("StorageInfo", () => {
   it("should render without crashing", () => {
-    shallow(
-      <StorageInfo storageInfo={ {used: 60} } fetchStorageInfo={jest.fn()} />
+    render(
+      <StorageInfo storageInfo={{ used: 60 }} fetchStorageInfo={jest.fn()} />
     )
   })
 
   it("should fetchStorageInfo before component is mounted", () => {
     const fetchStorageInfo = jest.fn()
-    shallow(
+    render(
       <StorageInfo
-        storageInfo={ {used: 60} }
+        storageInfo={{ used: 60 }}
         fetchStorageInfo={fetchStorageInfo}
       />
     )
@@ -38,12 +37,12 @@ describe("StorageInfo", () => {
 
   it("should not render anything if used is null", () => {
     const fetchStorageInfo = jest.fn()
-    const wrapper = shallow(
+    render(
       <StorageInfo
-      storageInfo={ {used: 0} }
+        storageInfo={{ used: 0 }}
         fetchStorageInfo={fetchStorageInfo}
       />
     )
-    expect(wrapper.text()).toBe("")
+    expect(document.body.innerHTML).toMatch(/^<div><noscript><\/noscript><\/div>$/);
   })
 })

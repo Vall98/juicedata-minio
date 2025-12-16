@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import React from "react"
 import { Modal } from "react-bootstrap"
 import logo from "../../img/logo.svg"
 

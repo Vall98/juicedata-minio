@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import React from "react"
 import ObjectsSearch from "../objects/ObjectsSearch"
 import Path from "../objects/Path"
 import StorageInfo from "./StorageInfo"

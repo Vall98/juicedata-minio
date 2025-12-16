@@ -14,43 +14,66 @@
  * limitations under the License.
  */
 
-import React from "react"
-import { shallow } from "enzyme"
+import { fireEvent, render, screen } from "@testing-library/react"
 import { UploadModal } from "../UploadModal"
+import { Provider } from "react-redux"
+import store from "../../store/store"
 
 describe("UploadModal", () => {
   it("should render without crashing", () => {
-    shallow(<UploadModal uploads={{}} />)
+    render(
+      <Provider store={store}>
+        <UploadModal uploads={{}} />
+      </Provider>
+    )
   })
 
   it("should render AbortConfirmModal when showAbort is true", () => {
-    const wrapper = shallow(<UploadModal uploads={{}} showAbort={true} />)
-    expect(wrapper.find("Connect(AbortConfirmModal)").length).toBe(1)
+    render(
+      <Provider store={store}>
+        <UploadModal uploads={{}} showAbort={true} />
+      </Provider>
+    )
+    const modal = screen.getByRole("dialog")
+    const modalText = screen.getByText("Abort uploads in progress?")
+    expect(modal).toBeInTheDocument()
+    expect(modalText).toBeInTheDocument()
   })
 
   it("should render nothing when there are no files being uploaded", () => {
-    const wrapper = shallow(<UploadModal uploads={{}} />)
-    expect(wrapper.find("noscript").length).toBe(1)
+    render(
+      <Provider store={store}>
+        <UploadModal uploads={{}} />
+      </Provider>
+    )
+    expect(screen.queryByRole("dialog")).toBeNull()
+    expect(screen.queryByRole("progressbar")).toBeNull()
   })
 
   it("should show upload progress when one or more files are being uploaded", () => {
-    const wrapper = shallow(
-      <UploadModal
-        uploads={{ "a-b/-test": { size: 100, loaded: 50, name: "test" } }}
-      />
+    render(
+      <Provider store={store}>
+        <UploadModal
+          uploads={{ "a-b/-test": { size: 100, loaded: 50, name: "test" } }}
+        />
+      </Provider>
     )
-    expect(wrapper.find("ProgressBar").length).toBe(1)
+    const progressbar = screen.getByRole("progressbar")
+    expect(progressbar).toHaveAttribute("aria-valuenow", "50")
   })
 
   it("should call showAbortModal when close button is clicked", () => {
     const showAbortModal = jest.fn()
-    const wrapper = shallow(
-      <UploadModal
-        uploads={{ "a-b/-test": { size: 100, loaded: 50, name: "test" } }}
-        showAbortModal={showAbortModal}
-      />
+    render(
+      <Provider store={store}>
+        <UploadModal
+          uploads={{ "a-b/-test": { size: 100, loaded: 50, name: "test" } }}
+          showAbortModal={showAbortModal}
+        />
+      </Provider>
     )
-    wrapper.find("button").simulate("click")
+    const btn = screen.getByRole("button", { name: "×" })
+    fireEvent.click(btn)
     expect(showAbortModal).toHaveBeenCalled()
   })
 })

@@ -21,8 +21,7 @@ import Alert from "../alert/Alert"
 import * as actionsAlert from "../alert/actions"
 import InputGroup from "./InputGroup"
 import web from "../web"
-import { Redirect } from "react-router-dom"
-import qs from "query-string"
+import { Navigate, useLocation } from "react-router-dom"
 import storage from "local-storage-fallback"
 import { redirectToOpenIDAuthURL, OPEN_ID_NONCE_KEY, OPEN_ID_STATE_KEY, OPEN_ID_REDIRECT_URI } from './utils'
 
@@ -78,23 +77,26 @@ export class OpenIDLogin extends React.Component {
   }
 
   componentDidMount() {
-    // Parse query params for code (Authorization Code flow)
-    const values = qs.parse(this.props.location.search)
-    if (values.error) {
-      this.props.showAlert("danger", values.error_description)
+    const params = new URLSearchParams(this.props.location.search);
+    const error = params.get("error");
+    const errorDescription = params.get("error_description");
+    const code = params.get("code");
+    const stateParam = params.get("state");
+
+    if (error) {
+      this.props.showAlert("danger", errorDescription)
       return
     }
 
-    if (values.code) {
+    if (code) {
       const state = storage.getItem(OPEN_ID_STATE_KEY)
-      if (!state || state !== values.state) {
+      if (!state || state !== stateParam) {
         this.props.showAlert("danger", "Invalid auth token")
         return
       }
 
       // Retrieve code_verifier
-      let code_verifier = storage.getItem(`oidc_code_verifier_${values.state}`)
-
+      let code_verifier = storage.getItem(`oidc_code_verifier_${stateParam}`)
       if (!code_verifier) {
         this.props.showAlert("danger", "Missing PKCE code_verifier")
         return
@@ -103,14 +105,14 @@ export class OpenIDLogin extends React.Component {
       const nonce = storage.getItem(OPEN_ID_NONCE_KEY)
 
       // Exchange code + verifier with backend which will perform token exchange and session creation
-      web.ExchangeCode({ code: values.code, code_verifier, redirect_uri: OPEN_ID_REDIRECT_URI(), state: values.state, nonce })
+      web.ExchangeCode({ code: code, code_verifier, redirect_uri: OPEN_ID_REDIRECT_URI(), state: stateParam, nonce })
         .then(() => {
           storage.removeItem(OPEN_ID_NONCE_KEY)
           storage.removeItem(OPEN_ID_STATE_KEY)
           try {
-            sessionStorage.removeItem(`oidc_code_verifier_${values.state}`)
+            sessionStorage.removeItem(`oidc_code_verifier_${stateParam}`)
           } catch (e) {
-            storage.removeItem(`oidc_code_verifier_${values.state}`)
+            storage.removeItem(`oidc_code_verifier_${stateParam}`)
           }
           this.forceUpdate()
         })
@@ -127,7 +129,7 @@ export class OpenIDLogin extends React.Component {
   render() {
     const { clearAlert, alert } = this.props
     if (web.LoggedIn()) {
-      return <Redirect to={"/"} />
+      return <Navigate to={"/"} />
     }
     let alertBox = <Alert {...alert} onDismiss={clearAlert} />
     // Make sure you don't show a fading out alert box on the initial web-page load.
@@ -172,7 +174,12 @@ const mapDispatchToProps = dispatch => {
   }
 }
 
-export default connect(
+const ConnectedOpenIDLogin = connect(
   state => state,
   mapDispatchToProps
 )(OpenIDLogin)
+
+export default function(props) {
+  const location = useLocation()
+  return <ConnectedOpenIDLogin {...props} location={location} />
+}

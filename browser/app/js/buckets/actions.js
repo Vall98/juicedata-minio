@@ -15,10 +15,10 @@
  */
 
 import web from "../web"
-import history from "../history"
 import * as alertActions from "../alert/actions"
 import * as objectsActions from "../objects/actions"
 import { pathSlice } from "../utils"
+import { navigate } from "../navigation"
 
 export const SET_LIST = "buckets/SET_LIST"
 export const ADD = "buckets/ADD"
@@ -31,7 +31,7 @@ export const SET_POLICIES = "buckets/SET_POLICIES"
 
 export const fetchBuckets = () => {
   return function(dispatch) {
-    const { bucket, prefix } = pathSlice(history.location.pathname)
+    const { bucket, prefix } = pathSlice(window.location.pathname)
     return web.ListBuckets().then(res => {
       const buckets = res.buckets ? res.buckets.map(bucket => bucket.name) : []
       if (buckets.length > 0) {
@@ -47,7 +47,7 @@ export const fetchBuckets = () => {
           dispatch(selectBucket(bucket, prefix))
         } else {
           dispatch(selectBucket(""))
-          history.replace("/")
+          navigate("/", { replace: true })
         }
       }
     })

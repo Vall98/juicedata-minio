@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-import configureStore from "redux-mock-store"
-import thunk from "redux-thunk"
+import { configureStore } from "@reduxjs/toolkit"
 import * as actionsBuckets from "../actions"
-import * as objectActions from "../../objects/actions"
-import history from "../../history"
+import alertReducer from "../../alert/reducer"
+import bucketsReducer from "../reducer"
 
 jest.mock("../../web", () => ({
   ListBuckets: jest.fn(() => {
@@ -31,155 +30,217 @@ jest.mock("../../web", () => ({
     return Promise.resolve()
   })
 }))
+/*
+jest.mock("../../navigation", () => ({
+  navigate: jest.fn()
+}))*/
 
 jest.mock("../../objects/actions", () => ({
-  selectPrefix: () => dispatch => {}
+  selectPrefix: () => dispatch => { }
 }))
 
-const middlewares = [thunk]
-const mockStore = configureStore(middlewares)
-
 describe("Buckets actions", () => {
+  let store;
+  beforeEach(() => {
+    store = configureStore({
+      reducer: { alert: alertReducer, buckets: bucketsReducer },
+      middleware: (getDefaultMiddleware) => getDefaultMiddleware(),
+    });
+  })
+
   it("creates buckets/SET_LIST and buckets/SET_CURRENT_BUCKET with first bucket after fetching the buckets", () => {
-    const store = mockStore()
-    const expectedActions = [
-      { type: "buckets/SET_LIST", buckets: ["test1", "test2"] },
-      { type: "buckets/SET_CURRENT_BUCKET", bucket: "test1" }
-    ]
+    const expectedState = {
+      currentBucket: "test1",
+      filter: "",
+      list: ["test1", "test2"],
+      policies: [],
+      showBucketPolicy: false,
+      showMakeBucketModal: false
+    }
     return store.dispatch(actionsBuckets.fetchBuckets()).then(() => {
-      const actions = store.getActions()
-      expect(actions).toEqual(expectedActions)
+      const state = store.getState()
+      expect(state.buckets).toEqual(expectedState)
     })
   })
 
   it("creates buckets/SET_CURRENT_BUCKET with bucket name in the url after fetching buckets", () => {
-    history.push("/test2")
-    const store = mockStore()
-    const expectedActions = [
-      { type: "buckets/SET_LIST", buckets: ["test1", "test2"] },
-      { type: "buckets/SET_CURRENT_BUCKET", bucket: "test2" }
-    ]
-    window.location
+    window.history.pushState({}, "", "/test2");
+    const expectedState = {
+      currentBucket: "test2",
+      filter: "",
+      list: ["test1", "test2"],
+      policies: [],
+      showBucketPolicy: false,
+      showMakeBucketModal: false
+    }
     return store.dispatch(actionsBuckets.fetchBuckets()).then(() => {
-      const actions = store.getActions()
-      expect(actions).toEqual(expectedActions)
+      const state = store.getState()
+      expect(state.buckets).toEqual(expectedState)
     })
   })
 
   it("creates buckets/SET_CURRENT_BUCKET with first bucket when the bucket in url is not exists after fetching buckets", () => {
-    history.push("/test3")
-    const store = mockStore()
-    const expectedActions = [
-      { type: "buckets/SET_LIST", buckets: ["test1", "test2"] },
-      { type: "buckets/SET_CURRENT_BUCKET", bucket: "test1" }
-    ]
-    window.location
+    window.history.pushState({}, "", "/test3");
+    const expectedState = {
+      currentBucket: "test1",
+      filter: "",
+      list: ["test1", "test2"],
+      policies: [],
+      showBucketPolicy: false,
+      showMakeBucketModal: false
+    }
     return store.dispatch(actionsBuckets.fetchBuckets()).then(() => {
-      const actions = store.getActions()
-      expect(actions).toEqual(expectedActions)
+      const state = store.getState()
+      expect(state.buckets).toEqual(expectedState)
     })
   })
 
   it("creates buckets/SET_CURRENT_BUCKET action when selectBucket is called", () => {
-    const store = mockStore()
-    const expectedActions = [
-      { type: "buckets/SET_CURRENT_BUCKET", bucket: "test1" }
-    ]
+    const expectedState = {
+      currentBucket: "test1",
+      filter: "",
+      list: [],
+      policies: [],
+      showBucketPolicy: false,
+      showMakeBucketModal: false
+    }
     store.dispatch(actionsBuckets.selectBucket("test1"))
-    const actions = store.getActions()
-    expect(actions).toEqual(expectedActions)
+    const state = store.getState()
+    expect(state.buckets).toEqual(expectedState)
   })
 
   it("creates buckets/SHOW_MAKE_BUCKET_MODAL for showMakeBucketModal", () => {
-    const store = mockStore()
-    const expectedActions = [
-      { type: "buckets/SHOW_MAKE_BUCKET_MODAL", show: true }
-    ]
+    const expectedState = {
+      currentBucket: "",
+      filter: "",
+      list: [],
+      policies: [],
+      showBucketPolicy: false,
+      showMakeBucketModal: true
+    }
     store.dispatch(actionsBuckets.showMakeBucketModal())
-    const actions = store.getActions()
-    expect(actions).toEqual(expectedActions)
+    const state = store.getState()
+    expect(state.buckets).toEqual(expectedState)
   })
 
   it("creates buckets/SHOW_MAKE_BUCKET_MODAL for hideMakeBucketModal", () => {
-    const store = mockStore()
-    const expectedActions = [
-      { type: "buckets/SHOW_MAKE_BUCKET_MODAL", show: false }
-    ]
+    const expectedState = {
+      currentBucket: "",
+      filter: "",
+      list: [],
+      policies: [],
+      showBucketPolicy: false,
+      showMakeBucketModal: false
+    }
     store.dispatch(actionsBuckets.hideMakeBucketModal())
-    const actions = store.getActions()
-    expect(actions).toEqual(expectedActions)
+    const state = store.getState()
+    expect(state.buckets).toEqual(expectedState)
   })
 
   it("creates buckets/SHOW_BUCKET_POLICY for showBucketPolicy", () => {
-    const store = mockStore()
-    const expectedActions = [
-      { type: "buckets/SHOW_BUCKET_POLICY", show: true }
-    ]
+    const expectedState = {
+      currentBucket: "",
+      filter: "",
+      list: [],
+      policies: [],
+      showBucketPolicy: true,
+      showMakeBucketModal: false
+    }
     store.dispatch(actionsBuckets.showBucketPolicy())
-    const actions = store.getActions()
-    expect(actions).toEqual(expectedActions)
+    const state = store.getState()
+    expect(state.buckets).toEqual(expectedState)
   })
 
   it("creates buckets/SHOW_BUCKET_POLICY for hideBucketPolicy", () => {
-    const store = mockStore()
-    const expectedActions = [
-      { type: "buckets/SHOW_BUCKET_POLICY", show: false }
-    ]
+    const expectedState = {
+      currentBucket: "",
+      filter: "",
+      list: [],
+      policies: [],
+      showBucketPolicy: false,
+      showMakeBucketModal: false
+    }
     store.dispatch(actionsBuckets.hideBucketPolicy())
-    const actions = store.getActions()
-    expect(actions).toEqual(expectedActions)
+    const state = store.getState()
+    expect(state.buckets).toEqual(expectedState)
   })
 
   it("creates buckets/SET_POLICIES action", () => {
-    const store = mockStore()
-    const expectedActions = [
-      { type: "buckets/SET_POLICIES", policies: ["test1", "test2"] }
-    ]
+    const expectedState = {
+      currentBucket: "",
+      filter: "",
+      list: [],
+      policies: ["test1", "test2"],
+      showBucketPolicy: false,
+      showMakeBucketModal: false
+    }
     store.dispatch(actionsBuckets.setPolicies(["test1", "test2"]))
-    const actions = store.getActions()
-    expect(actions).toEqual(expectedActions)
+    const state = store.getState()
+    expect(state.buckets).toEqual(expectedState)
   })
 
   it("creates buckets/ADD action", () => {
-    const store = mockStore()
-    const expectedActions = [{ type: "buckets/ADD", bucket: "test" }]
+    const expectedState = {
+      currentBucket: "",
+      filter: "",
+      list: ["test"],
+      policies: [],
+      showBucketPolicy: false,
+      showMakeBucketModal: false
+    }
     store.dispatch(actionsBuckets.addBucket("test"))
-    const actions = store.getActions()
-    expect(actions).toEqual(expectedActions)
+    const state = store.getState()
+    expect(state.buckets).toEqual(expectedState)
   })
 
   it("creates buckets/REMOVE action", () => {
-    const store = mockStore()
-    const expectedActions = [{ type: "buckets/REMOVE", bucket: "test" }]
+    const expectedState = {
+      currentBucket: "",
+      filter: "",
+      list: [],
+      policies: [],
+      showBucketPolicy: false,
+      showMakeBucketModal: false
+    }
     store.dispatch(actionsBuckets.removeBucket("test"))
-    const actions = store.getActions()
-    expect(actions).toEqual(expectedActions)
+    const state = store.getState()
+    expect(state.buckets).toEqual(expectedState)
   })
 
   it("creates buckets/ADD and buckets/SET_CURRENT_BUCKET after creating the bucket", () => {
-    const store = mockStore()
-    const expectedActions = [
-      { type: "buckets/ADD", bucket: "test1" },
-      { type: "buckets/SET_CURRENT_BUCKET", bucket: "test1" }
-    ]
+    const expectedState = {
+      currentBucket: "test1",
+      filter: "",
+      list: ["test1"],
+      policies: [],
+      showBucketPolicy: false,
+      showMakeBucketModal: false
+    }
     return store.dispatch(actionsBuckets.makeBucket("test1")).then(() => {
-      const actions = store.getActions()
-      expect(actions).toEqual(expectedActions)
+      const state = store.getState()
+      expect(state.buckets).toEqual(expectedState)
     })
   })
 
-  it("creates alert/SET, buckets/REMOVE, buckets/SET_LIST and buckets/SET_CURRENT_BUCKET " + 
-     "after deleting the bucket", () => {
-    const store = mockStore()
-    const expectedActions = [
-      { type: "alert/SET", alert: {id: 0, message: "Bucket 'test3' has been deleted.", type: "info"} },
-      { type: "buckets/REMOVE", bucket: "test3" },
-      { type: "buckets/SET_LIST", buckets: ["test1", "test2"] },
-      { type: "buckets/SET_CURRENT_BUCKET", bucket: "test1" }
-    ]
-    return store.dispatch(actionsBuckets.deleteBucket("test3")).then(() => {
-      const actions = store.getActions()
-      expect(actions).toEqual(expectedActions)
+  it("creates alert/SET, buckets/REMOVE, buckets/SET_LIST and buckets/SET_CURRENT_BUCKET " +
+    "after deleting the bucket", () => {
+      const expectedState = {
+        currentBucket: "test1",
+        filter: "",
+        list: ["test1", "test2"],
+        policies: [],
+        showBucketPolicy: false,
+        showMakeBucketModal: false
+      }
+      return store.dispatch(actionsBuckets.deleteBucket("test3")).then(() => {
+        const state = store.getState()
+        expect(state.buckets).toEqual(expectedState)
+        expect(state.alert).toEqual({
+          id: 0,
+          message: "Bucket 'test3' has been deleted.",
+          show: true,
+          type: "info"
+        })
+      })
     })
-  })
 })

@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import React from "react"
 import { connect } from "react-redux"
 import ObjectItem from "./ObjectItem"
 import PrefixActions from "./PrefixActions"

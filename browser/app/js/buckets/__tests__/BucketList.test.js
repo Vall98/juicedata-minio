@@ -14,9 +14,7 @@
  * limitations under the License.
  */
 
-import React from "react"
-import { shallow } from "enzyme"
-import history from "../../history"
+import { render } from "@testing-library/react"
 import { BucketList } from "../BucketList"
 
 jest.mock("../../web", () => ({
@@ -29,12 +27,12 @@ jest.mock("../../web", () => ({
 describe("BucketList", () => {
   it("should render without crashing", () => {
     const fetchBuckets = jest.fn()
-    shallow(<BucketList filteredBuckets={[]} fetchBuckets={fetchBuckets} />)
+    render(<BucketList filteredBuckets={[]} fetchBuckets={fetchBuckets} />)
   })
 
   it("should call fetchBuckets before component is mounted", () => {
     const fetchBuckets = jest.fn()
-    const wrapper = shallow(
+    render(
       <BucketList filteredBuckets={[]} fetchBuckets={fetchBuckets} />
     )
     expect(fetchBuckets).toHaveBeenCalled()
@@ -43,8 +41,8 @@ describe("BucketList", () => {
   it("should call setBucketList and selectBucket before component is mounted when the user has not loggedIn", () => {
     const setBucketList = jest.fn()
     const selectBucket = jest.fn()
-    history.push("/bk1/pre1")
-    const wrapper = shallow(
+    window.history.pushState({}, "", "/bk1/pre1");
+    render(
       <BucketList
         filteredBuckets={[]}
         setBucketList={setBucketList}

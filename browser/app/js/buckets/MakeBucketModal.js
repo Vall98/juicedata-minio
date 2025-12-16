@@ -46,7 +46,7 @@ export class MakeBucketModal extends React.Component {
     return (
       <Modal
         className="modal-create-bucket"
-        bsSize="small"
+        size="small"
         animation={false}
         show={showMakeBucketModal}
         onHide={this.hideModal.bind(this)}

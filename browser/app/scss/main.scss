@@ -1,0 +1,35 @@
+// We use @import because bootstrap 5 does not support @use.
+// TODO: Bootstrap 6 will support @use,
+// upgrade to Bootstap 6 when released and update the imports then.
+
+
+/*----------------------------
+    Bootstrap
+-----------------------------*/
+@import "bootstrap/scss/bootstrap";
+
+/*----------------------------
+    App
+-----------------------------*/
+@import 'inc/mixin';
+@import 'inc/variables';
+@import 'inc/base';
+@import 'inc/animate/animate';
+@import 'inc/generics';
+@import 'inc/font';
+@import 'inc/form';
+@import 'inc/buttons';
+@import 'inc/misc';
+@import 'inc/login';
+@import 'inc/header';
+@import 'inc/sidebar';
+@import 'inc/list';
+@import 'inc/file-explorer';
+@import 'inc/ie-warning';
+
+/*----------------------------
+    Boostrap
+-----------------------------*/
+@import 'inc/dropdown';
+@import 'inc/alert';
+@import 'inc/modal';

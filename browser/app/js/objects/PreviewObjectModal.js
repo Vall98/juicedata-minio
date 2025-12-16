@@ -40,7 +40,7 @@ class PreviewObjectModal extends React.Component {
         show={true}
         animation={false}
         onHide={hidePreviewModal}
-        bsSize="large"
+        size="large"
       >
         <ModalHeader>Preview</ModalHeader>
         <ModalBody>

@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-import React from "react"
-
 let InputGroup = ({
   label,
   id,
@@ -30,6 +28,7 @@ let InputGroup = ({
   align,
   className
 }) => {
+  const labelId = `${id}-label`
   var input = (
     <input
       id={id}
@@ -41,6 +40,7 @@ let InputGroup = ({
       spellCheck={spellCheck}
       required={required}
       autoComplete={autoComplete}
+      aria-labelledby={labelId}
     />
   )
   if (readonly)
@@ -55,6 +55,7 @@ let InputGroup = ({
         spellCheck={spellCheck}
         required={required}
         autoComplete={autoComplete}
+        aria-labelledby={labelId}
         disabled
       />
     )
@@ -62,7 +63,9 @@ let InputGroup = ({
     <div className={"input-group " + align + " " + className}>
       {input}
       <i className="ig-helpers" />
-      <label className="ig-label">{label}</label>
+      <label className="ig-label" htmlFor={id} id={labelId}>
+        {label}
+      </label>
     </div>
   )
 }
