@@ -21,7 +21,7 @@ import Alert from "../alert/Alert"
 import * as actionsAlert from "../alert/actions"
 import InputGroup from "./InputGroup"
 import web from "../web"
-import { Navigate } from "react-router-dom"
+import { Navigate, useLocation } from "react-router-dom"
 import storage from "local-storage-fallback"
 import { redirectToOpenIDAuthURL, OPEN_ID_NONCE_KEY, OPEN_ID_STATE_KEY, OPEN_ID_REDIRECT_URI } from './utils'
 
@@ -174,7 +174,12 @@ const mapDispatchToProps = dispatch => {
   }
 }
 
-export default connect(
+const ConnectedOpenIDLogin = connect(
   state => state,
   mapDispatchToProps
 )(OpenIDLogin)
+
+export default function(props) {
+  const location = useLocation()
+  return <ConnectedOpenIDLogin {...props} location={location} />
+}
