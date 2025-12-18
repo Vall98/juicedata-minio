@@ -34,6 +34,13 @@ import {
 } from "../constants"
 import { getServerInfo, hasServerPublicDomain } from '../browser/selectors'
 
+// Let tests mock this function to spy on navigation changes.
+export const navigation = {
+  navigateTo: (url) => {
+    window.location.assign(url)
+  }
+}
+
 export const SET_LIST = "objects/SET_LIST"
 export const RESET_LIST = "objects/RESET_LIST"
 export const SET_FILTER = "objects/SET_FILTER"
@@ -351,7 +358,7 @@ export const downloadObject = (object) => {
         .CreateURLToken()
         .then((res) => {
           const url = `${window.location.origin}${minioBrowserPrefix}/download/${currentBucket}/${encObjectName}?token=${res.token}`
-          window.location = url
+          navigation.navigateTo(url)
         })
         .catch((err) => {
           dispatch(
@@ -363,7 +370,7 @@ export const downloadObject = (object) => {
         })
     } else {
       const url = `${window.location.origin}${minioBrowserPrefix}/download/${currentBucket}/${encObjectName}?token=`
-      window.location = url
+      navigation.navigateTo(url)
     }
   }
 }
