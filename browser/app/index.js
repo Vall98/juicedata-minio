@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import "babel-polyfill"
 import "./less/main.less"
 import "@fortawesome/fontawesome-free/css/all.css"
 import "material-design-iconic-font/dist/css/material-design-iconic-font.min.css"
