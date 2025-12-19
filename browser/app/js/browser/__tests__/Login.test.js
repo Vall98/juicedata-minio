@@ -16,6 +16,7 @@
 
 import React from "react"
 import { shallow, mount } from "enzyme"
+import { MemoryRouter } from "react-router-dom"
 import { Login } from "../Login"
 import web from "../../web"
 
@@ -25,7 +26,7 @@ jest.mock("../../web", () => ({
   }),
   LoggedIn: jest.fn(),
   GetDiscoveryDoc: jest.fn(() => {
-    return Promise.resolve({ DiscoveryDoc: {"authorization_endpoint": "test"} })
+    return Promise.resolve({ DiscoveryDoc: { "authorization_endpoint": "test" } })
   })
 }))
 
@@ -35,36 +36,41 @@ describe("Login", () => {
   const clearAlertMock = jest.fn()
 
   it("should render without crashing", () => {
-    shallow(<Login
-      dispatch={dispatchMock}
-      alert={{ show: false, type: "danger"}}
-      showAlert={showAlertMock}
-      clearAlert={clearAlertMock}
-    />)
+    shallow(<MemoryRouter>
+      <Login
+        dispatch={dispatchMock}
+        alert={{ show: false, type: "danger" }}
+        showAlert={showAlertMock}
+        clearAlert={clearAlertMock}
+      />
+    </MemoryRouter>)
   })
 
   it("should initially have the is-guest class", () => {
-    const wrapper = shallow(
-      <Login
-        dispatch={dispatchMock}
-        alert={{ show: false, type: "danger"}}
-        showAlert={showAlertMock}
-        clearAlert={clearAlertMock}
-      />,
-      { attachTo: document.body }
+    mount(
+      <MemoryRouter>
+        <Login
+          dispatch={dispatchMock}
+          alert={{ show: false, type: "danger" }}
+          showAlert={showAlertMock}
+          clearAlert={clearAlertMock}
+        />
+      </MemoryRouter>
     )
     expect(document.body.classList.contains("is-guest")).toBeTruthy()
   })
 
   it("should throw an alert if the keys are empty in login form", () => {
     const wrapper = mount(
-      <Login
-        dispatch={dispatchMock}
-        alert={{ show: false, type: "danger"}}
-        showAlert={showAlertMock}
-        clearAlert={clearAlertMock}
-      />
-    )
+      <MemoryRouter>
+        <Login
+          dispatch={dispatchMock}
+          alert={{ show: false, type: "danger" }}
+          showAlert={showAlertMock}
+          clearAlert={clearAlertMock}
+        />
+      </MemoryRouter>
+    ).find(Login)
     // case where both keys are empty - displays the second warning
     wrapper.find("form").simulate("submit")
     expect(showAlertMock).toHaveBeenCalledWith("danger", "Secret Key cannot be empty")
@@ -88,13 +94,15 @@ describe("Login", () => {
 
   it("should call web.Login with correct arguments if both keys are entered", () => {
     const wrapper = mount(
-      <Login
-        dispatch={dispatchMock}
-        alert={{ show: false, type: "danger"}}
-        showAlert={showAlertMock}
-        clearAlert={clearAlertMock}
-      />
-    )
+      <MemoryRouter>
+        <Login
+          dispatch={dispatchMock}
+          alert={{ show: false, type: "danger" }}
+          showAlert={showAlertMock}
+          clearAlert={clearAlertMock}
+        />
+      </MemoryRouter>
+    ).find(Login)
     wrapper.setState({
       accessKey: "accessKey",
       secretKey: "secretKey"
