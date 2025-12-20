@@ -15,7 +15,7 @@
  */
 
 import React from "react"
-import { Modal, ModalHeader, ModalBody } from "react-bootstrap"
+import { Modal } from "react-bootstrap"
 
 class PreviewObjectModal extends React.Component {
   constructor(props) {
@@ -42,8 +42,8 @@ class PreviewObjectModal extends React.Component {
         onHide={hidePreviewModal}
         bsSize="large"
       >
-        <ModalHeader>Preview</ModalHeader>
-        <ModalBody>
+        <Modal.Header>Preview</Modal.Header>
+        <Modal.Body>
           <div className="input-group">
             {this.state.url && (
               <object data={this.state.url} style={{ display: "block", width: "100%" }}>
@@ -53,7 +53,7 @@ class PreviewObjectModal extends React.Component {
               </object>
             )}
           </div>
-        </ModalBody>
+        </Modal.Body>
         <div className="modal-footer">
           {
             <button className="btn btn-link" onClick={hidePreviewModal}>
