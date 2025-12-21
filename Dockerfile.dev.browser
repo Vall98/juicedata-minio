@@ -1,12 +1,22 @@
-FROM ubuntu:20.04
+FROM node:16-bullseye-slim
 
 LABEL maintainer="MinIO Inc <dev@min.io>"
 
-RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends --no-install-suggests \
-      git golang make npm && \
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+      ca-certificates git make curl && \
+    update-ca-certificates && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
-ENV PATH=$PATH:/root/go/bin
+ENV GO_VERSION=1.20.14
+RUN curl -fsSL https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.gz | tar -C /usr/local -xz
 
-RUN go get github.com/go-bindata/go-bindata/go-bindata && \
-    go get github.com/elazarl/go-bindata-assetfs/go-bindata-assetfs
+ENV PATH=/usr/local/go/bin:$PATH
+ENV GO111MODULE=on
+
+RUN go install github.com/go-bindata/go-bindata/go-bindata@latest && \
+    go install github.com/elazarl/go-bindata-assetfs/go-bindata-assetfs@latest
+
+ENV GOFLAGS="-buildvcs=false"
+
+CMD ["/bin/bash"]
