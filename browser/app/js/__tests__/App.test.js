@@ -15,7 +15,7 @@
  */
 
 import React from "react"
-import { shallow, mount } from "enzyme"
+import { render, screen } from "@testing-library/react"
 import { MemoryRouter } from "react-router-dom"
 import App from "../App"
 
@@ -24,42 +24,46 @@ jest.mock("../browser/Browser", () => () => <div>Browser</div>)
 
 describe("App", () => {
   it("should render without crashing", () => {
-    shallow(<App />)
+    render(
+      <MemoryRouter>
+        <App />
+      </MemoryRouter>
+    )
   })
 
   it("should render Login component for '/login' route", () => {
-    const wrapper = mount(
+    render(
       <MemoryRouter initialEntries={["/login"]}>
         <App />
       </MemoryRouter>
     )
-    expect(wrapper.text()).toBe("Login")
+    expect(screen.getByText("Login")).toBeTruthy()
   })
 
   it("should render Browser component for '/' route", () => {
-    const wrapper = mount(
+    render(
       <MemoryRouter initialEntries={["/"]}>
         <App />
       </MemoryRouter>
     )
-    expect(wrapper.text()).toBe("Browser")
+    expect(screen.getByText("Browser")).toBeTruthy()
   })
 
   it("should render Browser component for '/bucket' route", () => {
-    const wrapper = mount(
+    render(
       <MemoryRouter initialEntries={["/bucket"]}>
         <App />
       </MemoryRouter>
     )
-    expect(wrapper.text()).toBe("Browser")
+    expect(screen.getByText("Browser")).toBeTruthy()
   })
 
   it("should render Browser component for '/bucket/a/b/c' route", () => {
-    const wrapper = mount(
+    render(
       <MemoryRouter initialEntries={["/bucket/a/b/c"]}>
         <App />
       </MemoryRouter>
     )
-    expect(wrapper.text()).toBe("Browser")
+    expect(screen.getByText("Browser")).toBeTruthy()
   })
 })
