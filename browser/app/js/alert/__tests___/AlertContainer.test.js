@@ -15,20 +15,28 @@
  */
 
 import React from "react"
-import { shallow, mount } from "enzyme"
+import { render, screen, within } from "@testing-library/react"
 import { AlertContainer } from "../AlertContainer"
 
 describe("Alert", () => {
   it("should render without crashing", () => {
-    shallow(
+    render(
       <AlertContainer alert={{ show: true, type: "danger", message: "Test" }} />
     )
   })
+  
+  it("should render the alert message", () => {
+    render(
+      <AlertContainer alert={{ show: true, type: "danger", message: "Test" }} />
+    )
+    const alert = screen.getByRole('alert')
+    expect(within(alert).getByText("Test")).toBeTruthy()
+  })
 
   it("should render nothing if message is empty", () => {
-    const wrapper = shallow(
+    render(
       <AlertContainer alert={{ show: true, type: "danger", message: "" }} />
     )
-    expect(wrapper.find("Alert").length).toBe(0)
+    expect(screen.queryByRole("alert")).toBeNull()
   })
 })
