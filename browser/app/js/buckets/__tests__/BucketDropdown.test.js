@@ -24,16 +24,11 @@ describe("BucketDropdown", () => {
   })
 
   it("should call toggleDropdown on dropdown toggle", () => {
-    const spy = jest.spyOn(BucketDropdown.prototype, 'toggleDropdown')
-    const wrapper = shallow(
-      <BucketDropdown />
-    )
-    wrapper
-      .find("Uncontrolled(Dropdown)")
-      .simulate("toggle")
-    expect(spy).toHaveBeenCalled()
-    spy.mockReset()
-    spy.mockRestore()
+    const wrapper = mount(<BucketDropdown />)
+    expect(wrapper.state("showBucketDropdown")).toBeFalsy()
+    wrapper.find("Dropdown").props().onToggle()
+    wrapper.update()
+    expect(wrapper.state("showBucketDropdown")).toBeTruthy()
   })
 
   it("should call showBucketPolicy when Edit Policy link is clicked", () => {

@@ -19,3 +19,8 @@ import { configure } from "enzyme"
 import Adapter from "enzyme-adapter-react-16"
 
 configure({ adapter: new Adapter() })
+
+// Workaround until tests are fixed to not rely on setImmediate
+global.setImmediate = (fn, ...args) => {
+  return setTimeout(fn, 0, ...args);
+};

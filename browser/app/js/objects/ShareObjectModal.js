@@ -16,7 +16,7 @@
 
 import React from "react"
 import { connect } from "react-redux"
-import { Modal, ModalHeader, ModalBody } from "react-bootstrap"
+import { Modal } from "react-bootstrap"
 import CopyToClipboard from "react-copy-to-clipboard"
 import web from "../web"
 import * as objectsActions from "./actions"
@@ -87,8 +87,8 @@ export class ShareObjectModal extends React.Component {
         onHide={hideShareObject}
         bsSize="small"
       >
-        <ModalHeader>Share Object</ModalHeader>
-        <ModalBody>
+        <Modal.Header>Share Object</Modal.Header>
+        <Modal.Body>
           <div className="input-group copy-text">
             <QRCode value={url} size={128}/>
             <label>Shareable Link</label>
@@ -179,7 +179,7 @@ export class ShareObjectModal extends React.Component {
             </div>
           </div>
           )}
-        </ModalBody>
+        </Modal.Body>
         <div className="modal-footer">
           <CopyToClipboard
             text={url}

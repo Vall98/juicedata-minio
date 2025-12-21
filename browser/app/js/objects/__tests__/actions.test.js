@@ -27,6 +27,8 @@ import {
 } from "../../constants"
 import history from "../../history"
 
+jest.spyOn(actionsObjects.navigation, "navigateTo").mockImplementation(jest.fn())
+
 jest.mock("../../web", () => ({
   LoggedIn: jest
     .fn(() => true)
@@ -365,7 +367,7 @@ describe("Objects actions", () => {
     const store = mockStore({
       buckets: { currentBucket: "test-public" },
       objects: { currentPrefix: "pre1/" },
-      browser: { serverInfo: { info: { domains: ['public.com'] }} },
+      browser: { serverInfo: { info: { domains: ['public.com'] } } },
     })
     const expectedActions = [
       {
@@ -418,51 +420,27 @@ describe("Objects actions", () => {
 
   describe("Download object", () => {
     it("should download the object non-LoggedIn users", () => {
-      const setLocation = jest.fn()
-      Object.defineProperty(window, "location", {
-        set(url) {
-          setLocation(url)
-        },
-        get() {
-          return {
-            origin: "http://localhost:8080"
-          }
-        }
-      })
       const store = mockStore({
         buckets: { currentBucket: "bk1" },
         objects: { currentPrefix: "pre1/" }
       })
       store.dispatch(actionsObjects.downloadObject("obj1"))
-      const url = `${
-        window.location.origin
-      }${minioBrowserPrefix}/download/bk1/${encodeURI("pre1/obj1")}?token=`
-      expect(setLocation).toHaveBeenCalledWith(url)
+      const url = `${window.location.origin
+        }${minioBrowserPrefix}/download/bk1/${encodeURI("pre1/obj1")}?token=`
+      expect(actionsObjects.navigation.navigateTo).toHaveBeenCalledWith(url)
     })
 
     it("should download the object for LoggedIn users", () => {
-      const setLocation = jest.fn()
-      Object.defineProperty(window, "location", {
-        set(url) {
-          setLocation(url)
-        },
-        get() {
-          return {
-            origin: "http://localhost:8080"
-          }
-        }
-      })
       const store = mockStore({
         buckets: { currentBucket: "bk1" },
         objects: { currentPrefix: "pre1/" }
       })
       return store.dispatch(actionsObjects.downloadObject("obj1")).then(() => {
-        const url = `${
-          window.location.origin
-        }${minioBrowserPrefix}/download/bk1/${encodeURI(
-          "pre1/obj1"
-        )}?token=test`
-        expect(setLocation).toHaveBeenCalledWith(url)
+        const url = `${window.location.origin
+          }${minioBrowserPrefix}/download/bk1/${encodeURI(
+            "pre1/obj1"
+          )}?token=test`
+        expect(actionsObjects.navigation.navigateTo).toHaveBeenCalledWith(url)
       })
     })
 
@@ -502,9 +480,8 @@ describe("Objects actions", () => {
       objects: { currentPrefix: "pre1/" }
     })
     return store.dispatch(actionsObjects.downloadPrefix("pre2/")).then(() => {
-      const requestUrl = `${
-        location.origin
-      }${minioBrowserPrefix}/zip?token=test`
+      const requestUrl = `${location.origin
+        }${minioBrowserPrefix}/zip?token=test`
       expect(open).toHaveBeenCalledWith("POST", requestUrl, true)
       expect(send).toHaveBeenCalledWith(
         JSON.stringify({
@@ -568,9 +545,8 @@ describe("Objects actions", () => {
       objects: { currentPrefix: "pre1/", checkedList: ["obj1"] }
     })
     return store.dispatch(actionsObjects.downloadCheckedObjects()).then(() => {
-      const requestUrl = `${
-        location.origin
-      }${minioBrowserPrefix}/zip?token=test`
+      const requestUrl = `${location.origin
+        }${minioBrowserPrefix}/zip?token=test`
       expect(open).toHaveBeenCalledWith("POST", requestUrl, true)
       expect(send).toHaveBeenCalledWith(
         JSON.stringify({

@@ -22,7 +22,7 @@ import { getRandomAccessKey, getRandomSecretKey } from "../utils"
 import jwtDecode from "jwt-decode"
 import classNames from "classnames"
 
-import { Modal, ModalBody, ModalHeader } from "react-bootstrap"
+import { Modal } from "react-bootstrap"
 import InputGroup from "./InputGroup"
 import { ACCESS_KEY_MIN_LENGTH, SECRET_KEY_MIN_LENGTH } from "../constants"
 
@@ -117,10 +117,10 @@ export class ChangePasswordModal extends React.Component {
     if (!allowChangePassword) {
       return (
         <Modal bsSize="sm" animation={false} show={true}>
-          <ModalHeader>Change Password</ModalHeader>
-          <ModalBody>
+          <Modal.Header>Change Password</Modal.Header>
+          <Modal.Body>
             Credentials of this user cannot be updated through MinIO Browser.
-          </ModalBody>
+          </Modal.Body>
           <div className="modal-footer">
             <button
               id="cancel-change-password"
@@ -136,8 +136,8 @@ export class ChangePasswordModal extends React.Component {
 
     return (
       <Modal bsSize="sm" animation={false} show={true}>
-        <ModalHeader>Change Password</ModalHeader>
-        <ModalBody className="m-t-20">
+        <Modal.Header>Change Password</Modal.Header>
+        <Modal.Body className="m-t-20">
           <div className="has-toggle-password">
             <InputGroup
               value={this.state.currentAccessKey}
@@ -204,12 +204,9 @@ export class ChangePasswordModal extends React.Component {
               required="required"
               autoComplete="false"
               align="ig-left"
-              onChange={e => {
-                this.setState({ newSecretKey: e.target.value })
-              }}
             />
           </div>
-        </ModalBody>
+        </Modal.Body>
         <div className="modal-footer">
           <button
             id="generate-keys"
