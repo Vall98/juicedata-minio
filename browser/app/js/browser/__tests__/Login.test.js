@@ -15,8 +15,8 @@
  */
 
 import React from "react"
-import { shallow, mount } from "enzyme"
 import { MemoryRouter } from "react-router-dom"
+import { render, screen, fireEvent } from "@testing-library/react"
 import { Login } from "../Login"
 import web from "../../web"
 
@@ -36,18 +36,20 @@ describe("Login", () => {
   const clearAlertMock = jest.fn()
 
   it("should render without crashing", () => {
-    shallow(<MemoryRouter>
-      <Login
-        dispatch={dispatchMock}
-        alert={{ show: false, type: "danger" }}
-        showAlert={showAlertMock}
-        clearAlert={clearAlertMock}
-      />
-    </MemoryRouter>)
+    render(
+      <MemoryRouter>
+        <Login
+          dispatch={dispatchMock}
+          alert={{ show: false, type: "danger" }}
+          showAlert={showAlertMock}
+          clearAlert={clearAlertMock}
+        />
+      </MemoryRouter>
+    )
   })
 
   it("should initially have the is-guest class", () => {
-    mount(
+    render(
       <MemoryRouter>
         <Login
           dispatch={dispatchMock}
@@ -61,7 +63,7 @@ describe("Login", () => {
   })
 
   it("should throw an alert if the keys are empty in login form", () => {
-    const wrapper = mount(
+    render(
       <MemoryRouter>
         <Login
           dispatch={dispatchMock}
@@ -70,30 +72,33 @@ describe("Login", () => {
           clearAlert={clearAlertMock}
         />
       </MemoryRouter>
-    ).find(Login)
+    )
+    const btn = screen.getByRole("button")
+    const accessInput = screen.getByLabelText("Access Key")
+    const secretInput = screen.getByLabelText("Secret Key")
+
     // case where both keys are empty - displays the second warning
-    wrapper.find("form").simulate("submit")
+    fireEvent.change(accessInput, { target: { value: "" } })
+    fireEvent.change(secretInput, { target: { value: "" } })
+    fireEvent.click(btn)
     expect(showAlertMock).toHaveBeenCalledWith("danger", "Secret Key cannot be empty")
+    showAlertMock.mockClear()
 
     // case where access key is empty
-    wrapper.setState({
-      accessKey: "",
-      secretKey: "secretKey"
-    })
-    wrapper.find("form").simulate("submit")
+    fireEvent.change(secretInput, { target: { value: "secretKey" } })
+    fireEvent.click(btn)
     expect(showAlertMock).toHaveBeenCalledWith("danger", "Access Key cannot be empty")
+    showAlertMock.mockClear()
 
     // case where secret key is empty
-    wrapper.setState({
-      accessKey: "accessKey",
-      secretKey: ""
-    })
-    wrapper.find("form").simulate("submit")
+    fireEvent.change(accessInput, { target: { value: "accessKey" } })
+    fireEvent.change(secretInput, { target: { value: "" } })
+    fireEvent.click(btn)
     expect(showAlertMock).toHaveBeenCalledWith("danger", "Secret Key cannot be empty")
   })
 
   it("should call web.Login with correct arguments if both keys are entered", () => {
-    const wrapper = mount(
+    render(
       <MemoryRouter>
         <Login
           dispatch={dispatchMock}
@@ -102,12 +107,13 @@ describe("Login", () => {
           clearAlert={clearAlertMock}
         />
       </MemoryRouter>
-    ).find(Login)
-    wrapper.setState({
-      accessKey: "accessKey",
-      secretKey: "secretKey"
-    })
-    wrapper.find("form").simulate("submit")
+    )
+    const btn = screen.getByRole("button")
+    const accessInput = screen.getByLabelText("Access Key")
+    const secretInput = screen.getByLabelText("Secret Key")
+    fireEvent.change(accessInput, { target: { value: "accessKey" } })
+    fireEvent.change(secretInput, { target: { value: "secretKey" } })
+    fireEvent.click(btn)
     expect(web.Login).toHaveBeenCalledWith({
       "username": "accessKey",
       "password": "secretKey"

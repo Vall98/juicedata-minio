@@ -15,11 +15,18 @@
  */
 
 import React from "react"
-import { shallow } from "enzyme"
+import { render } from "@testing-library/react"
+import { Provider } from "react-redux"
 import MainContent from "../MainContent"
+import configureStore from "../../store/configure-store"
 
 describe("MainContent", () => {
   it("should render without crashing", () => {
-    shallow(<MainContent />)
+    const store = configureStore()
+    render(
+      <Provider store={store}>
+        <MainContent />
+      </Provider>
+    )
   })
 })

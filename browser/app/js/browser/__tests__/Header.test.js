@@ -15,28 +15,54 @@
  */
 
 import React from "react"
-import { shallow } from "enzyme"
+import { render, screen, waitFor } from "@testing-library/react"
+import { Provider } from "react-redux"
 import Header from "../Header"
+import configureStore from "../../store/configure-store"
+import web from "../../web"
 
 jest.mock("../../web", () => ({
-  LoggedIn: jest
-    .fn(() => true)
-    .mockReturnValueOnce(true)
-    .mockReturnValueOnce(false)
+  LoggedIn: jest.fn(() => true),
+  ServerInfo: jest.fn(() => Promise.resolve({})),
+  StorageInfo: jest.fn(() => {
+    console.log("Mocked StorageInfo called")
+    return Promise.resolve({ used: 60 })}
+  ),
 }))
 describe("Header", () => {
   it("should render without crashing", () => {
-    shallow(<Header />)
+    const store = configureStore()
+    render(
+      <Provider store={store}>
+        <Header />
+      </Provider>
+    )
   })
 
   it("should render Login button when the user has not LoggedIn", () => {
-    const wrapper = shallow(<Header />)
-    expect(wrapper.find("a").text()).toBe("Login")
+    const store = configureStore()
+    web.LoggedIn.mockReturnValue(false)
+    render(
+      <Provider store={store}>
+        <Header />
+      </Provider>
+    )
+    expect(screen.getByRole('link', { name: "Login" })).toBeTruthy()
+    expect(screen.queryByRole("link", { name: "Logout" })).toBeNull()
+    expect(screen.queryByRole("button")).toBeNull()
   })
 
   it("should render StorageInfo and BrowserDropdown when the user has LoggedIn", () => {
-    const wrapper = shallow(<Header />)
-    expect(wrapper.find("Connect(BrowserDropdown)").length).toBe(1)
-    expect(wrapper.find("Connect(StorageInfo)").length).toBe(1)
+    const store = configureStore()
+    web.LoggedIn.mockReturnValue(true)
+    render(
+      <Provider store={store}>
+        <Header />
+      </Provider>
+    )
+    expect(screen.queryByRole("link", { name: "Login" })).toBeNull()
+    expect(screen.getByRole("link", { name: "Logout" })).toBeTruthy()
+    expect(screen.getByRole("button").classList.contains("dropdown-toggle")).toBeTruthy()
+    return waitFor(() => expect(screen.getByText("60 bytes")).toBeTruthy())
   })
 })

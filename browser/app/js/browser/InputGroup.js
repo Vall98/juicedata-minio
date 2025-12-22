@@ -62,7 +62,7 @@ let InputGroup = ({
     <div className={"input-group " + align + " " + className}>
       {input}
       <i className="ig-helpers" />
-      <label className="ig-label">{label}</label>
+      <label htmlFor={id} className="ig-label">{label}</label>
     </div>
   )
 }
