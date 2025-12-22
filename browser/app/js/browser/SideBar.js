@@ -16,12 +16,12 @@
 
 import React from "react"
 import classNames from "classnames"
-import ClickOutHandler from "react-onclickout"
 import { connect } from "react-redux"
 
 import logo from "../../img/logo.svg"
 import BucketSearch from "../buckets/BucketSearch"
 import BucketList from "../buckets/BucketList"
+import ClickOutHandler from "../components/ClickOutHandler"
 import Host from "./Host"
 import * as actionsCommon from "./actions"
 import web from "../web"
