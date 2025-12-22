@@ -16,9 +16,9 @@
 
 import React from "react"
 import { connect } from "react-redux"
-import ClickOutHandler from "react-onclickout"
 import { OverlayTrigger, Tooltip } from "react-bootstrap"
 import { getCurrentBucket } from "../buckets/selectors"
+import ClickOutHandler from "../components/ClickOutHandler"
 import * as actionsObjects from "./actions"
 import * as actionsBuckets from "../buckets/actions"
 
