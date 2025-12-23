@@ -15,25 +15,42 @@
  */
 
 import React from "react"
-import { shallow } from "enzyme"
+import { fireEvent, render, screen } from "@testing-library/react"
 import { Bucket } from "../Bucket"
+import { Provider } from "react-redux"
+import configureStore from "../../store/configure-store"
 
 describe("Bucket", () => {
   it("should render without crashing", () => {
-    shallow(<Bucket />)
+    const store = configureStore()
+    render(
+      <Provider store={store}>
+        <Bucket />
+      </Provider>
+    )
   })
 
   it("should call selectBucket when clicked", () => {
+    const store = configureStore()
     const selectBucket = jest.fn()
-    const wrapper = shallow(
-      <Bucket bucket={"test"} selectBucket={selectBucket} />
+    render(
+      <Provider store={store}>
+        <Bucket bucket={"test"} selectBucket={selectBucket} />
+      </Provider>
     )
-    wrapper.find("li").simulate("click", { preventDefault: jest.fn() })
+    const bucketLink = screen.getByRole("link", { name: "test" })
+    fireEvent.click(bucketLink, { preventDefault: jest.fn() })
     expect(selectBucket).toHaveBeenCalledWith("test")
   })
 
   it("should highlight the selected bucket", () => {
-    const wrapper = shallow(<Bucket bucket={"test"} isActive={true} />)
-    expect(wrapper.find("li").hasClass("active")).toBeTruthy()
+    const store = configureStore()
+    render(
+      <Provider store={store}>
+        <Bucket bucket={"test"} isActive={true} />
+      </Provider>
+    )
+    const bucket = screen.getByRole("link", { name: "test" }).parentElement
+    expect(bucket.classList.contains("active")).toBeTruthy()
   })
 })

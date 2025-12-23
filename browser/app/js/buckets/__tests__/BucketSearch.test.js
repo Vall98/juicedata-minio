@@ -15,18 +15,19 @@
  */
 
 import React from "react"
-import { shallow } from "enzyme"
+import { render, screen, fireEvent } from "@testing-library/react"
 import { BucketSearch } from "../BucketSearch"
 
 describe("BucketSearch", () => {
   it("should render without crashing", () => {
-    shallow(<BucketSearch />)
+    render(<BucketSearch />)
   })
 
   it("should call onChange with search text", () => {
     const onChange = jest.fn()
-    const wrapper = shallow(<BucketSearch onChange={onChange} />)
-    wrapper.find("input").simulate("change", { target: { value: "test" } })
+    render(<BucketSearch onChange={onChange} />)
+    const input = screen.getByRole("textbox")
+    fireEvent.change(input, { target: { value: "test" } })
     expect(onChange).toHaveBeenCalledWith("test")
   })
 })
