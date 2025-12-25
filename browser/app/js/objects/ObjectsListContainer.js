@@ -68,7 +68,7 @@ export class ObjectsListContainer extends React.Component {
         >
           <ObjectsList objects={visibleObjects} />
         </InfiniteScroll>
-        {listLoading && <div className="loading" />}
+        {listLoading && <div className="loading" role="status" />}
       </div>
     )
   }

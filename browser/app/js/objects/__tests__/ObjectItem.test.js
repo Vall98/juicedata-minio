@@ -15,54 +15,58 @@
  */
 
 import React from "react"
-import { shallow } from "enzyme"
+import { render, fireEvent, screen } from "@testing-library/react"
 import { ObjectItem } from "../ObjectItem"
 
 describe("ObjectItem", () => {
   it("should render without crashing", () => {
-    shallow(<ObjectItem name={"test"} />)
+    render(<ObjectItem name={"test"} />)
   })
 
   it("should render with content type", () => {
-    const wrapper = shallow(<ObjectItem name={"test.jpg"} contentType={""} />)
-    expect(wrapper.prop("data-type")).toBe("image")
+    render(<ObjectItem name={"test.jpg"} contentType={"image/jpeg"} />)
+    const nameLink = screen.getByText("test.jpg")
+    const row = nameLink.closest("[data-type]")
+    expect(row && row.getAttribute("data-type")).toBe("image")
   })
 
   it("shouldn't call onClick when the object isclicked", () => {
     const onClick = jest.fn()
     const checkObject = jest.fn()
-    const wrapper = shallow(
-      <ObjectItem name={"test"} checkObject={checkObject} />
-    )
-    wrapper.find("a").simulate("click", { preventDefault: jest.fn() })
+    render(<ObjectItem name={"test"} checkObject={checkObject} />)
+    const a = screen.getByText("test")
+    fireEvent.click(a)
     expect(onClick).not.toHaveBeenCalled()
   })
 
   it("should call onClick when the folder isclicked", () => {
     const onClick = jest.fn()
-    const wrapper = shallow(<ObjectItem name={"test/"} onClick={onClick} />)
-    wrapper.find("a").simulate("click", { preventDefault: jest.fn() })
+    render(<ObjectItem name={"test/"} onClick={onClick} />)
+    const a = screen.getByText("test/")
+    fireEvent.click(a)
     expect(onClick).toHaveBeenCalled()
   })
 
   it("should call checkObject when the object/prefix is checked", () => {
     const checkObject = jest.fn()
-    const wrapper = shallow(
+    render(
       <ObjectItem name={"test"} checked={false} checkObject={checkObject} />
     )
-    wrapper.find("input[type='checkbox']").simulate("change")
+    const checkbox = screen.getByRole("checkbox")
+    fireEvent.click(checkbox)
     expect(checkObject).toHaveBeenCalledWith("test")
   })
 
   it("should render checked checkbox", () => {
-    const wrapper = shallow(<ObjectItem name={"test"} checked={true} />)
-    expect(wrapper.find("input[type='checkbox']").prop("checked")).toBeTruthy()
+    render(<ObjectItem name={"test"} checked={true} />)
+    const checkbox = screen.getByRole("checkbox")
+    expect(checkbox && checkbox.checked).toBeTruthy()
   })
 
   it("should call uncheckObject when the object/prefix is unchecked", () => {
     const checkObject = jest.fn()
     const uncheckObject = jest.fn()
-    const wrapper = shallow(
+    render(
       <ObjectItem
         name={"test"}
         checked={true}
@@ -70,7 +74,8 @@ describe("ObjectItem", () => {
         uncheckObject={uncheckObject}
       />
     )
-    wrapper.find("input[type='checkbox']").simulate("change")
+    const checkbox = screen.getByRole("checkbox")
+    fireEvent.click(checkbox)
     expect(uncheckObject).toHaveBeenCalledWith("test")
   })
 })

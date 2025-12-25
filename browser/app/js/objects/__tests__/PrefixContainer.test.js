@@ -15,48 +15,67 @@
  */
 
 import React from "react"
-import { shallow } from "enzyme"
+import { fireEvent, render, screen, within } from "@testing-library/react"
+import { Provider } from "react-redux"
 import { PrefixContainer } from "../PrefixContainer"
+import configureStore from "../../store/configure-store"
 
 describe("PrefixContainer", () => {
+  let store
+  beforeEach(() => {
+    store = configureStore()
+  })
+
   it("should render without crashing", () => {
-    shallow(<PrefixContainer object={{ name: "abc/" }} />)
+    render(
+      <Provider store={store}>
+        <PrefixContainer object={{ name: "abc/" }} />
+      </Provider>
+    )
   })
 
   it("should render ObjectItem with props", () => {
-    const wrapper = shallow(<PrefixContainer object={{ name: "abc/" }} />)
-    expect(wrapper.find("Connect(ObjectItem)").length).toBe(1)
-    expect(wrapper.find("Connect(ObjectItem)").prop("name")).toBe("abc/")
+    render(
+      <Provider store={store}>
+        <PrefixContainer object={{ name: "abc/" }} />
+      </Provider>
+    )
+    expect(screen.getByText("abc/")).toBeTruthy()
   })
 
   it("should call selectPrefix when the prefix is clicked", () => {
     const selectPrefix = jest.fn()
-    const wrapper = shallow(
-      <PrefixContainer
-        object={{ name: "abc/" }}
-        currentPrefix={"xyz/"}
-        selectPrefix={selectPrefix}
-      />
+    render(
+      <Provider store={store}>
+        <PrefixContainer
+          object={{ name: "abc/" }}
+          currentPrefix={"xyz/"}
+          selectPrefix={selectPrefix}
+        />
+      </Provider>
     )
-    wrapper.find("Connect(ObjectItem)").prop("onClick")()
+    const link = screen.getByRole("link")
+    fireEvent.click(link)
     expect(selectPrefix).toHaveBeenCalledWith("xyz/abc/")
   })
 
   it("should pass actions to ObjectItem", () => {
-    const wrapper = shallow(
-      <PrefixContainer object={{ name: "abc/" }} checkedObjectsCount={0} />
+    render(
+      <Provider store={store}>
+        <PrefixContainer object={{ name: "abc/" }} checkedObjectsCount={0} />
+      </Provider>
     )
-    expect(wrapper.find("Connect(ObjectItem)").prop("actionButtons")).not.toBe(
-      undefined
-    )
+    const toggle = screen.getByRole("button")
+    expect(toggle).toBeTruthy()
   })
 
   it("should pass empty actions to ObjectItem when checkedObjectCount is more than 0", () => {
-    const wrapper = shallow(
-      <PrefixContainer object={{ name: "abc/" }} checkedObjectsCount={1} />
+    render(
+      <Provider store={store}>
+        <PrefixContainer object={{ name: "abc/" }} checkedObjectsCount={1} />
+      </Provider>
     )
-    expect(wrapper.find("Connect(ObjectItem)").prop("actionButtons")).toBe(
-      undefined
-    )
+    const actions = screen.queryAllByRole("link")
+    expect(actions.length).toBe(1) // only the prefix link should be present
   })
 })

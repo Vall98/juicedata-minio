@@ -112,6 +112,7 @@ export class ShareObjectModal extends React.Component {
                   id="increase-days"
                   className="set-expire-increase"
                   onClick={() => this.updateExpireValue("days", 1)}
+                  aria-label="increase days"
                 />
                 <div className="set-expire-title">Days</div>
                 <div className="set-expire-value">
@@ -128,6 +129,7 @@ export class ShareObjectModal extends React.Component {
                   id="decrease-days"
                   className="set-expire-decrease"
                   onClick={() => this.updateExpireValue("days", -1)}
+                  aria-label="decrease days"
                 />
               </div>
               <div className="set-expire-item">
@@ -135,6 +137,7 @@ export class ShareObjectModal extends React.Component {
                   id="increase-hours"
                   className="set-expire-increase"
                   onClick={() => this.updateExpireValue("hours", 1)}
+                  aria-label="increase hours"
                 />
                 <div className="set-expire-title">Hours</div>
                 <div className="set-expire-value">
@@ -151,6 +154,7 @@ export class ShareObjectModal extends React.Component {
                   className="set-expire-decrease"
                   id="decrease-hours"
                   onClick={() => this.updateExpireValue("hours", -1)}
+                  aria-label="decrease hours"
                 />
               </div>
               <div className="set-expire-item">
@@ -158,6 +162,7 @@ export class ShareObjectModal extends React.Component {
                   id="increase-minutes"
                   className="set-expire-increase"
                   onClick={() => this.updateExpireValue("minutes", 1)}
+                  aria-label="increase minutes"
                 />
                 <div className="set-expire-title">Minutes</div>
                 <div className="set-expire-value">
@@ -174,6 +179,7 @@ export class ShareObjectModal extends React.Component {
                   id="decrease-minutes"
                   className="set-expire-decrease"
                   onClick={() => this.updateExpireValue("minutes", -1)}
+                  aria-label="decrease minutes"
                 />
               </div>
             </div>

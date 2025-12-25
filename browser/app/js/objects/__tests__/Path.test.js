@@ -15,76 +15,57 @@
  */
 
 import React from "react"
-import { shallow, mount } from "enzyme"
+import { render, fireEvent, screen } from "@testing-library/react"
 import { Path } from "../Path"
 
 describe("Path", () => {
   it("should render without crashing", () => {
-    shallow(<Path currentBucket={"test1"} currentPrefix={"test2"} />)
+    render(<Path currentBucket={"test1"} currentPrefix={"test2"} />)
   })
 
   it("should render only bucket if there is no prefix", () => {
-    const wrapper = shallow(<Path currentBucket={"test1"} currentPrefix={""} />)
-    expect(wrapper.find("span").length).toBe(1)
-    expect(
-      wrapper
-        .find("span")
-        .at(0)
-        .text()
-    ).toBe("test1")
+    render(<Path currentBucket={"test1"} currentPrefix={""} />)
+    const bucket = screen.getByRole("link", { name: "test1" })
+    expect(bucket.parentElement.parentElement.children.length).toBe(2) // only one <span> in the <h2> title, + the edit link.
   })
 
   it("should render bucket and prefix", () => {
-    const wrapper = shallow(
+    render(
       <Path currentBucket={"test1"} currentPrefix={"a/b/"} />
     )
-    expect(wrapper.find("span").length).toBe(3)
-    expect(
-      wrapper
-        .find("span")
-        .at(0)
-        .text()
-    ).toBe("test1")
-    expect(
-      wrapper
-        .find("span")
-        .at(1)
-        .text()
-    ).toBe("a")
-    expect(
-      wrapper
-        .find("span")
-        .at(2)
-        .text()
-    ).toBe("b")
+    const bucket = screen.getByRole("link", { name: "test1" })
+    const prefix1 = screen.getByRole("link", { name: "a" })
+    const prefix2 = screen.getByRole("link", { name: "b" })
+    expect(bucket.parentElement.parentElement.children.length).toBe(4) // 3 <span> in the <h2> title, + the edit link.
+    expect(prefix1).toBeTruthy()
+    expect(prefix2).toBeTruthy()
   })
 
   it("should call selectPrefix when a prefix part is clicked", () => {
     const selectPrefix = jest.fn()
-    const wrapper = shallow(
+    render(
       <Path
         currentBucket={"test1"}
         currentPrefix={"a/b/"}
         selectPrefix={selectPrefix}
       />
     )
-    wrapper
-      .find("a")
-      .at(2)
-      .simulate("click", { preventDefault: jest.fn() })
+    const link = screen.getByRole("link", { name: "b" })
+    fireEvent.click(link)
     expect(selectPrefix).toHaveBeenCalledWith("a/b/")
   })
 
   it("should switch to input mode when edit icon is clicked", () => {
-    const wrapper = mount(<Path currentBucket={"test1"} currentPrefix={""} />)
-    wrapper.find(".fe-edit").simulate("click", { preventDefault: jest.fn() })
-    expect(wrapper.find(".form-control--path").exists()).toBeTruthy()
+    render(<Path currentBucket={"test1"} currentPrefix={""} />)
+    const edit = screen.getByRole("link", { name: "" })
+    fireEvent.click(edit)
+    expect(screen.getByPlaceholderText('Choose or create new path')).toBeTruthy()
   })
 
   it("should navigate to prefix when user types path for existing bucket", () => {
     const selectBucket = jest.fn()
     const buckets = ["test1", "test2"]
-    const wrapper = mount(
+    render(
       <Path
         buckets={buckets}
         currentBucket={"test1"}
@@ -92,18 +73,19 @@ describe("Path", () => {
         selectBucket={selectBucket}
       />
     )
-    wrapper.setState({
-      isEditing: true,
-      path: "test2/dir1/"
-    })
-    wrapper.find("form").simulate("submit", { preventDefault: jest.fn() })
+    const edit = screen.getByRole("link", { name: "" })
+    fireEvent.click(edit)
+    const input = screen.getByPlaceholderText('Choose or create new path')
+    fireEvent.change(input, { target: { value: 'test2/dir1/' } })
+    const form = input.closest('form')
+    if (form) fireEvent.submit(form)
     expect(selectBucket).toHaveBeenCalledWith("test2", "dir1/")
   })
 
   it("should create a new bucket if bucket typed in path doesn't exist", () => {
     const makeBucket = jest.fn()
     const buckets = ["test1", "test2"]
-    const wrapper = mount(
+    render(
       <Path
         buckets={buckets}
         currentBucket={"test1"}
@@ -111,11 +93,12 @@ describe("Path", () => {
         makeBucket={makeBucket}
       />
     )
-    wrapper.setState({
-      isEditing: true,
-      path: "test3/dir1/"
-    })
-    wrapper.find("form").simulate("submit", { preventDefault: jest.fn() })
+    const edit = screen.getByRole("link", { name: "" })
+    fireEvent.click(edit)
+    const input = screen.getByPlaceholderText('Choose or create new path')
+    fireEvent.change(input, { target: { value: 'test3/dir1/' } })
+    const form = input.closest('form')
+    if (form) fireEvent.submit(form)
     expect(makeBucket).toHaveBeenCalledWith("test3")
   })
 
@@ -123,7 +106,7 @@ describe("Path", () => {
     const makeBucket = jest.fn()
     const selectBucket = jest.fn()
     const buckets = ["test1", "test2"]
-    const wrapper = mount(
+    render(
       <Path
         buckets={buckets}
         currentBucket={"test1"}
@@ -132,11 +115,13 @@ describe("Path", () => {
         selectBucket={selectBucket}
       />
     )
-    wrapper.setState({
-      isEditing: true,
-      path: "//dir1/dir2/"
-    })
-    wrapper.find("form").simulate("submit", { preventDefault: jest.fn() })
+    const edit = screen.getByRole("link", { name: "" })
+    fireEvent.click(edit)
+    const input = screen.getByPlaceholderText('Choose or create new path')
+    fireEvent.change(input, { target: { value: '//dir1/dir2/' } })
+    const form = input.closest('form')
+    expect(form).not.toBeNull()
+    fireEvent.submit(form)
     expect(makeBucket).not.toHaveBeenCalled()
     expect(selectBucket).not.toHaveBeenCalled()
   })

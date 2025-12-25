@@ -84,6 +84,7 @@ export class ObjectsBulkActions extends React.Component {
           className="la-close fas fa-times"
           id="close-bulk-actions"
           onClick={clearChecked}
+          aria-label="close objects actions"
         />
         {this.state.showDeleteConfirmation && (
           <DeleteObjectConfirmModal

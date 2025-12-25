@@ -15,31 +15,29 @@
  */
 
 import React from "react"
-import { shallow } from "enzyme"
+import { render, screen, fireEvent } from "@testing-library/react"
 import { DeleteObjectConfirmModal } from "../DeleteObjectConfirmModal"
 
 describe("DeleteObjectConfirmModal", () => {
   it("should render without crashing", () => {
-    shallow(<DeleteObjectConfirmModal />)
+    render(<DeleteObjectConfirmModal />)
   })
 
   it("should call deleteObject when Delete is clicked", () => {
     const deleteObject = jest.fn()
-    const wrapper = shallow(
+    render(
       <DeleteObjectConfirmModal deleteObject={deleteObject} />
     )
-    wrapper.find("ConfirmModal").prop("okHandler")()
+    const delBtn = screen.getByRole("button", { name: "Delete" })
+    fireEvent.click(delBtn)
     expect(deleteObject).toHaveBeenCalled()
   })
 
   it("should call hideDeleteConfirmModal when Cancel is clicked", () => {
     const hideDeleteConfirmModal = jest.fn()
-    const wrapper = shallow(
-      <DeleteObjectConfirmModal
-        hideDeleteConfirmModal={hideDeleteConfirmModal}
-      />
-    )
-    wrapper.find("ConfirmModal").prop("cancelHandler")()
+    render(<DeleteObjectConfirmModal hideDeleteConfirmModal={hideDeleteConfirmModal} />)
+    const cancelBtn = screen.getByRole("button", { name: "Cancel" })
+    fireEvent.click(cancelBtn)
     expect(hideDeleteConfirmModal).toHaveBeenCalled()
   })
 })
