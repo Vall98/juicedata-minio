@@ -28,8 +28,12 @@ jest.mock("../../web", () => ({
 }))
 
 describe("SideBar", () => {
+  let store
+  beforeEach(() => {
+    store = configureStore()
+  })
+
   it("should render without crashing", () => {
-    const store = configureStore()
     LoggedIn.mockReturnValue(true)
     render(
       <Provider store={store}>
@@ -40,7 +44,6 @@ describe("SideBar", () => {
   })
 
   it("should render BucketSearch for LoggedIn users", () => {
-    const store = configureStore()
     LoggedIn.mockReturnValue(true)
     render(
       <Provider store={store}>
@@ -53,7 +56,6 @@ describe("SideBar", () => {
   })
 
   it("should not render BucketSearch for non LoggedIn users", () => {
-    const store = configureStore()
     render(
       <Provider store={store}>
         <SideBar />
@@ -64,7 +66,6 @@ describe("SideBar", () => {
   })
 
   it("should call clickOutside when the user clicks outside the sidebar", () => {
-    const store = configureStore()
     const clickOutside = jest.fn()
     render(
       <Provider store={store}>
@@ -76,7 +77,6 @@ describe("SideBar", () => {
   })
 
   it("should not call clickOutside when user clicks on sidebar toggle", () => {
-    const store = configureStore()
     const clickOutside = jest.fn()
     render(
       <Provider store={store}>

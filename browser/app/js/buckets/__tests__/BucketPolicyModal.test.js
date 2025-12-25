@@ -15,15 +15,19 @@
  */
 
 import React from "react"
-import { render, screen, fireEvent, within, waitFor } from "@testing-library/react"
+import { render, screen, fireEvent, waitFor } from "@testing-library/react"
 import { Provider } from "react-redux"
 import { BucketPolicyModal } from "../BucketPolicyModal"
 import { READ_ONLY } from "../../constants"
 import configureStore from "../../store/configure-store"
 
 describe("BucketPolicyModal", () => {
+  let store
+  beforeEach(() => {
+    store = configureStore()
+  })
+
   it("should render without crashing", () => {
-    const store = configureStore()
     render(
       <Provider store={store}>
         <BucketPolicyModal policies={[]} />
@@ -32,7 +36,6 @@ describe("BucketPolicyModal", () => {
   })
 
   it("should call hideBucketPolicy when close button is clicked", () => {
-    const store = configureStore()
     const hideBucketPolicy = jest.fn()
     render(
       <Provider store={store}>
@@ -45,7 +48,6 @@ describe("BucketPolicyModal", () => {
   })
 
   it("should include the PolicyInput and Policy components when there are any policies", () => {
-    const store = configureStore()
     render(
       <Provider store={store}>
         <BucketPolicyModal showBucketPolicy={true} policies={[{ prefix: "test", policy: READ_ONLY }]} />

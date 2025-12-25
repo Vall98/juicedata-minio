@@ -19,7 +19,6 @@ import { render, screen, fireEvent } from "@testing-library/react"
 import { Provider } from "react-redux"
 import { ObjectContainer } from "../ObjectContainer"
 import configureStore from "../../store/configure-store"
-import { contentType } from "mime-types"
 
 describe("ObjectContainer", () => {
   let store

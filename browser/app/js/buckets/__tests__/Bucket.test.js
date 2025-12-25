@@ -21,8 +21,12 @@ import { Provider } from "react-redux"
 import configureStore from "../../store/configure-store"
 
 describe("Bucket", () => {
+  let store
+  beforeEach(() => {
+    store = configureStore()
+  })
+
   it("should render without crashing", () => {
-    const store = configureStore()
     render(
       <Provider store={store}>
         <Bucket />
@@ -31,7 +35,6 @@ describe("Bucket", () => {
   })
 
   it("should call selectBucket when clicked", () => {
-    const store = configureStore()
     const selectBucket = jest.fn()
     render(
       <Provider store={store}>
@@ -44,7 +47,6 @@ describe("Bucket", () => {
   })
 
   it("should highlight the selected bucket", () => {
-    const store = configureStore()
     render(
       <Provider store={store}>
         <Bucket bucket={"test"} isActive={true} />

@@ -25,13 +25,17 @@ jest.mock("../../web", () => ({
   LoggedIn: jest.fn(() => true),
   ServerInfo: jest.fn(() => Promise.resolve({})),
   StorageInfo: jest.fn(() => {
-    console.log("Mocked StorageInfo called")
-    return Promise.resolve({ used: 60 })}
-  ),
+    return Promise.resolve({ used: 60 })
+  }),
 }))
+
 describe("Header", () => {
+  let store
+  beforeEach(() => {
+    store = configureStore()
+  })
+
   it("should render without crashing", () => {
-    const store = configureStore()
     render(
       <Provider store={store}>
         <Header />
@@ -40,7 +44,6 @@ describe("Header", () => {
   })
 
   it("should render Login button when the user has not LoggedIn", () => {
-    const store = configureStore()
     web.LoggedIn.mockReturnValue(false)
     render(
       <Provider store={store}>
@@ -53,7 +56,6 @@ describe("Header", () => {
   })
 
   it("should render StorageInfo and BrowserDropdown when the user has LoggedIn", () => {
-    const store = configureStore()
     web.LoggedIn.mockReturnValue(true)
     render(
       <Provider store={store}>
