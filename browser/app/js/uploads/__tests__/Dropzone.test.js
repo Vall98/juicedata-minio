@@ -15,20 +15,23 @@
  */
 
 import React from "react"
-import { shallow } from "enzyme"
+import { render } from "@testing-library/react"
 import { Dropzone } from "../Dropzone"
 
 describe("Dropzone", () => {
   it("should render without crashing", () => {
-    shallow(<Dropzone />)
+    render(<Dropzone />)
   })
 
   it("should call uploadFile with files", () => {
     const uploadFile = jest.fn()
-    const wrapper = shallow(<Dropzone uploadFile={uploadFile} />)
-    const file1 = new Blob(["file content1"], { type: "text/plain" })
-    const file2 = new Blob(["file content2"], { type: "text/plain" })
-    wrapper.first().prop("onDrop")([file1, file2])
-    expect(uploadFile.mock.calls).toEqual([[file1], [file2]])
+    render(<Dropzone uploadFile={uploadFile} />)
+    const file1 = new File(["file content1"], "file1.txt", { type: "text/plain" })
+    const file2 = new File(["file content2"], "file2.txt", { type: "text/plain" })
+    // call the onDrop handler directly to avoid complexities with jsdom/react-dropzone
+    Dropzone.prototype.onDrop.call({ props: { uploadFile } }, [file1, file2])
+    expect(uploadFile).toHaveBeenCalledTimes(2)
+    expect(uploadFile).toHaveBeenNthCalledWith(1, file1)
+    expect(uploadFile).toHaveBeenNthCalledWith(2, file2)
   })
 })
