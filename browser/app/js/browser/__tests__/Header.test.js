@@ -24,9 +24,7 @@ import web from "../../web"
 jest.mock("../../web", () => ({
   LoggedIn: jest.fn(() => true),
   ServerInfo: jest.fn(() => Promise.resolve({})),
-  StorageInfo: jest.fn(() => {
-    return Promise.resolve({ used: 60 })
-  }),
+  StorageInfo: jest.fn(() => Promise.resolve({ used: 60 })),
 }))
 
 describe("Header", () => {
