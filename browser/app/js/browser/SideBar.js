@@ -28,7 +28,7 @@ import web from "../web"
 
 export const SideBar = ({ sidebarOpen, clickOutside }) => {
   const onClickOut = e => {
-    if (e.target.classList.contains("feh-trigger")) {
+    if (e.target.classList?.contains("feh-trigger")) {
       return
     }
     clickOutside()

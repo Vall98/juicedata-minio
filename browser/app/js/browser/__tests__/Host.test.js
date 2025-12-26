@@ -15,11 +15,11 @@
  */
 
 import React from "react"
-import { shallow } from "enzyme"
+import { render } from "@testing-library/react"
 import Host from "../Host"
 
 describe("Host", () => {
   it("should render without crashing", () => {
-    shallow(<Host />)
+    render(<Host />)
   })
 })

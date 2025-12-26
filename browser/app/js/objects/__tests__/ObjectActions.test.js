@@ -15,151 +15,189 @@
  */
 
 import React from "react"
-import { shallow } from "enzyme"
+import { render, screen, fireEvent } from "@testing-library/react"
+import { Provider } from "react-redux"
 import { ObjectActions } from "../ObjectActions"
+import configureStore from "../../store/configure-store"
 
 describe("ObjectActions", () => {
+  let store
+  beforeEach(() => {
+    store = configureStore()
+  })
+
   it("should render without crashing", () => {
-    shallow(<ObjectActions object={{ name: "obj1" }} currentPrefix={"pre1/"} />)
+    render(
+      <Provider store={store}>
+        <ObjectActions object={{ name: "obj1" }} currentPrefix={"pre1/"} />
+      </Provider>
+    )
   })
 
   it("should show DeleteObjectConfirmModal when delete action is clicked", () => {
-    const wrapper = shallow(
-      <ObjectActions object={{ name: "obj1" }} currentPrefix={"pre1/"} />
+    render(
+      <Provider store={store}>
+        <ObjectActions object={{ name: "obj1" }} currentPrefix={"pre1/"} />
+      </Provider>
     )
-    wrapper
-      .find("a")
-      .last()
-      .simulate("click", { preventDefault: jest.fn() })
-    expect(wrapper.state("showDeleteConfirmation")).toBeTruthy()
-    expect(wrapper.find("DeleteObjectConfirmModal").length).toBe(1)
+    const toggle = screen.getByRole("button")
+    fireEvent.click(toggle)
+    const deleteLink = screen.getByRole("link", { name: "Delete" })
+    fireEvent.click(deleteLink)
+    expect(screen.getByText("Are you sure you want to delete?")).not.toBeNull()
   })
 
   it("should hide DeleteObjectConfirmModal when Cancel button is clicked", () => {
-    const wrapper = shallow(
-      <ObjectActions object={{ name: "obj1" }} currentPrefix={"pre1/"} />
+    render(
+      <Provider store={store}>
+        <ObjectActions object={{ name: "obj1" }} currentPrefix={"pre1/"} />
+      </Provider>
     )
-    wrapper
-      .find("a")
-      .last()
-      .simulate("click", { preventDefault: jest.fn() })
-    wrapper.find("DeleteObjectConfirmModal").prop("hideDeleteConfirmModal")()
-    wrapper.update()
-    expect(wrapper.state("showDeleteConfirmation")).toBeFalsy()
-    expect(wrapper.find("DeleteObjectConfirmModal").length).toBe(0)
+    const toggle = screen.getByRole("button")
+    fireEvent.click(toggle)
+    const deleteLink = screen.getByRole("link", { name: "Delete" })
+    fireEvent.click(deleteLink)
+    expect(screen.getByText("Are you sure you want to delete?")).not.toBeNull()
+    const cancelBtn = screen.getByRole("button", { name: "Cancel" })
+    fireEvent.click(cancelBtn)
+    expect(screen.queryByText("Are you sure you want to delete?")).toBeNull()
+    expect(screen.queryByRole("dialog")).toBeNull()
   })
 
   it("should call deleteObject with object name", () => {
     const deleteObject = jest.fn()
-    const wrapper = shallow(
-      <ObjectActions
-        object={{ name: "obj1" }}
-        currentPrefix={"pre1/"}
-        deleteObject={deleteObject}
-      />
+    render(
+      <Provider store={store}>
+        <ObjectActions
+          object={{ name: "obj1" }}
+          currentPrefix={"pre1/"}
+          deleteObject={deleteObject}
+        />
+      </Provider>
     )
-    wrapper
-      .find("a")
-      .last()
-      .simulate("click", { preventDefault: jest.fn() })
-    wrapper.find("DeleteObjectConfirmModal").prop("deleteObject")()
+    const toggle = screen.getByRole("button")
+    fireEvent.click(toggle)
+    const deleteLink = screen.getByRole("link", { name: "Delete" })
+    fireEvent.click(deleteLink)
+    const delBtn = screen.getByRole("button", { name: "Delete" })
+    fireEvent.click(delBtn)
     expect(deleteObject).toHaveBeenCalledWith("obj1")
   })
 
 
   it("should call downloadObject when single object is selected and download button is clicked", () => {
     const downloadObject = jest.fn()
-    const wrapper = shallow(
-      <ObjectActions
-        object={{ name: "obj1" }}
-        currentPrefix={"pre1/"}
-        downloadObject={downloadObject} />
+    render(
+      <Provider store={store}>
+        <ObjectActions
+          object={{ name: "obj1" }}
+          currentPrefix={"pre1/"}
+          downloadObject={downloadObject} />
+      </Provider>
     )
-    wrapper
-      .find("a")
-      .at(1)
-      .simulate("click", { preventDefault: jest.fn() })
+    const toggle = screen.getByRole("button")
+    fireEvent.click(toggle)
+    const downloadLink = screen.getByRole("link", { name: "Download" })
+    fireEvent.click(downloadLink)
     expect(downloadObject).toHaveBeenCalled()
   })
 
 
   it("should show PreviewObjectModal when preview action is clicked", () => {
-    const wrapper = shallow(
-      <ObjectActions 
-      object={{ name: "obj1", contentType: "image/jpeg"}} 
-      currentPrefix={"pre1/"} />
+    render(
+      <Provider store={store}>
+        <ObjectActions
+          object={{ name: "obj1", contentType: "image/jpeg" }}
+          currentPrefix={"pre1/"}
+          getObjectURL={jest.fn()}
+        />
+      </Provider>
     )
-    wrapper
-      .find("a")
-      .at(1)
-      .simulate("click", { preventDefault: jest.fn() })
-    expect(wrapper.state("showPreview")).toBeTruthy()
-    expect(wrapper.find("PreviewObjectModal").length).toBe(1)
+    const toggle = screen.getByRole("button")
+    fireEvent.click(toggle)
+    const previewLink = screen.getByRole("link", { name: "Preview" })
+    fireEvent.click(previewLink)
+    expect(screen.getByText("Preview")).not.toBeNull()
   })
 
   it("should hide PreviewObjectModal when cancel button is clicked", () => {
-    const wrapper = shallow(
-      <ObjectActions 
-        object={{ name: "obj1" , contentType: "image/jpeg"}}
-        currentPrefix={"pre1/"} />
+    render(
+      <Provider store={store}>
+        <ObjectActions
+          object={{ name: "obj1", contentType: "image/jpeg" }}
+          currentPrefix={"pre1/"}
+          getObjectURL={jest.fn()}
+        />
+      </Provider>
     )
-    wrapper
-      .find("a")
-      .at(1)
-      .simulate("click", { preventDefault: jest.fn() })
-    wrapper.find("PreviewObjectModal").prop("hidePreviewModal")()
-    wrapper.update()
-    expect(wrapper.state("showPreview")).toBeFalsy()
-    expect(wrapper.find("PreviewObjectModal").length).toBe(0)
+    const toggle = screen.getByRole("button")
+    fireEvent.click(toggle)
+    const previewLink = screen.getByRole("link", { name: "Preview" })
+    fireEvent.click(previewLink)
+    expect(screen.getByText("Preview")).not.toBeNull()
+    const cancelBtn = screen.getByRole("button", { name: "Cancel" })
+    fireEvent.click(cancelBtn)
+    expect(screen.queryByRole("dialog")).toBeNull()
+    expect(screen.queryByText("Preview")).toBeNull()
   })
+
   it("should not show PreviewObjectModal when preview action is clicked if object is not an image", () => {
-    const wrapper = shallow(
-      <ObjectActions 
-      object={{ name: "obj1"}} 
-      currentPrefix={"pre1/"} />
+    render(
+      <Provider store={store}>
+        <ObjectActions
+          object={{ name: "obj1" }}
+          currentPrefix={"pre1/"} />
+      </Provider>
     )
-    expect(wrapper
-      .find("a")
-      .length).toBe(3) // find only the other 2
+    const toggle = screen.getByRole("button")
+    fireEvent.click(toggle)
+    const links = screen.getAllByRole("link")
+    expect(links.length).toBe(3) // find only the other 2
   })
 
   it("should call shareObject with object and expiry", () => {
     const shareObject = jest.fn()
-    const wrapper = shallow(
-      <ObjectActions
-        object={{ name: "obj1" }}
-        currentPrefix={"pre1/"}
-        shareObject={shareObject}
-      />
+    render(
+      <Provider store={store}>
+        <ObjectActions
+          object={{ name: "obj1" }}
+          currentPrefix={"pre1/"}
+          shareObject={shareObject}
+        />
+      </Provider>
     )
-    wrapper
-      .find("a")
-      .first()
-      .simulate("click", { preventDefault: jest.fn() })
+    const toggle = screen.getByRole("button")
+    fireEvent.click(toggle)
+    const shareLink = screen.getByRole("link", { name: "Share" })
+    fireEvent.click(shareLink)
     expect(shareObject).toHaveBeenCalledWith("obj1", 5, 0, 0)
   })
 
   it("should render ShareObjectModal when an object is shared", () => {
-    const wrapper = shallow(
-      <ObjectActions
-        object={{ name: "obj1" }}
-        currentPrefix={"pre1/"}
-        showShareObjectModal={true}
-        shareObjectName={"obj1"}
-      />
+    render(
+      <Provider store={store}>
+        <ObjectActions
+          object={{ name: "obj1" }}
+          currentPrefix={"pre1/"}
+          showShareObjectModal={true}
+          shareObjectName={"obj1"}
+        />
+      </Provider>
     )
-    expect(wrapper.find("Connect(ShareObjectModal)").length).toBe(1)
+    expect(screen.queryByText("Share Object")).not.toBeNull()
   })
 
   it("shouldn't render ShareObjectModal when the names of the objects don't match", () => {
-    const wrapper = shallow(
-      <ObjectActions
-        object={{ name: "obj1" }}
-        currentPrefix={"pre1/"}
-        showShareObjectModal={true}
-        shareObjectName={"obj2"}
-      />
+    render(
+      <Provider store={store}>
+        <ObjectActions
+          object={{ name: "obj1" }}
+          currentPrefix={"pre1/"}
+          showShareObjectModal={true}
+          shareObjectName={"obj2"}
+        />
+      </Provider>
     )
-    expect(wrapper.find("Connect(ShareObjectModal)").length).toBe(0)
+    expect(screen.queryByText("Share Object")).toBeNull()
   })
 })

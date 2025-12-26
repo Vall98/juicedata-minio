@@ -15,9 +15,10 @@
  */
 
 import React from "react"
-import { shallow } from "enzyme"
-import BucketContainer from "../BucketContainer"
+import { render, screen, fireEvent } from "@testing-library/react"
+import { Provider } from "react-redux"
 import configureStore from "redux-mock-store"
+import BucketContainer from "../BucketContainer"
 
 const mockStore = configureStore()
 
@@ -31,22 +32,37 @@ describe("BucketContainer", () => {
     })
     store.dispatch = jest.fn()
   })
-  
+
   it("should render without crashing", () => {
-    shallow(<BucketContainer store={store}/>)
+    render(
+      <Provider store={store}>
+        <BucketContainer />
+      </Provider>
+    )
   })
 
   it('maps state and dispatch to props', () => {
-    const wrapper = shallow(<BucketContainer store={store}/>)
-    expect(wrapper.props()).toEqual(expect.objectContaining({
-      isActive: expect.any(Boolean),
-      selectBucket: expect.any(Function)
-    }))
+    render(
+      <Provider store={store}>
+        <BucketContainer />
+      </Provider>
+    )
+    const dropdown = screen.getByRole("button")
+    fireEvent.click(dropdown)
+    expect(screen.getByText("Edit policy")).toBeTruthy()
+    expect(screen.getByText("Delete")).toBeTruthy()
   })
 
   it('maps selectBucket to dispatch action', () => {
-    const wrapper = shallow(<BucketContainer store={store}/>)
-    wrapper.props().selectBucket()
+    render(
+      <Provider store={store}>
+        <BucketContainer />
+      </Provider>
+    )
+    const dropdown = screen.getByRole("button")
+    fireEvent.click(dropdown)
+    const editPolicy = screen.getByText("Edit policy")
+    fireEvent.click(editPolicy)
     expect(store.dispatch).toHaveBeenCalled()
   })
 })

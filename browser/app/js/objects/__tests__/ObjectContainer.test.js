@@ -15,35 +15,54 @@
  */
 
 import React from "react"
-import { shallow } from "enzyme"
+import { render, screen, fireEvent } from "@testing-library/react"
+import { Provider } from "react-redux"
 import { ObjectContainer } from "../ObjectContainer"
+import configureStore from "../../store/configure-store"
 
 describe("ObjectContainer", () => {
+  let store
+  beforeEach(() => {
+    store = configureStore()
+  })
+
   it("should render without crashing", () => {
-    shallow(<ObjectContainer object={{ name: "test1.jpg" }} />)
+    render(
+      <Provider store={store}>
+        <ObjectContainer object={{ name: "test1.jpg", contentType: "image/jpeg" }} />
+      </Provider>
+    )
   })
 
   it("should render ObjectItem with props", () => {
-    const wrapper = shallow(<ObjectContainer object={{ name: "test1.jpg" }} />)
-    expect(wrapper.find("Connect(ObjectItem)").length).toBe(1)
-    expect(wrapper.find("Connect(ObjectItem)").prop("name")).toBe("test1.jpg")
+    render(
+      <Provider store={store}>
+        <ObjectContainer object={{ name: "test1.jpg", contentType: "image/jpeg" }} />
+      </Provider>
+    )
+    expect(screen.getByText("test1.jpg")).toBeTruthy()
   })
 
   it("should pass actions to ObjectItem", () => {
-    const wrapper = shallow(
-      <ObjectContainer object={{ name: "test1.jpg" }} checkedObjectsCount={0} />
+    render(
+      <Provider store={store}>
+        <ObjectContainer object={{ name: "test1.jpg", contentType: "image/jpeg" }} checkedObjectsCount={0} />
+      </Provider>
     )
-    expect(wrapper.find("Connect(ObjectItem)").prop("actionButtons")).not.toBe(
-      undefined
-    )
+    const toggle = screen.getByRole("button")
+    fireEvent.click(toggle)
+    const links = screen.getAllByRole("link")
+    expect(links.length).toBe(5) // name, share, preview, download, delete
   })
 
   it("should pass empty actions to ObjectItem when checkedObjectCount is more than 0", () => {
-    const wrapper = shallow(
-      <ObjectContainer object={{ name: "test1.jpg" }} checkedObjectsCount={1} />
+    render(
+      <Provider store={store}>
+        <ObjectContainer object={{ name: "test1.jpg", contentType: "image/jpeg" }} checkedObjectsCount={1} />
+      </Provider>
     )
-    expect(wrapper.find("Connect(ObjectItem)").prop("actionButtons")).toBe(
-      undefined
-    )
+    const links = screen.getAllByRole("link")
+    // only the name link should be present
+    expect(links.length).toBe(1)
   })
 })

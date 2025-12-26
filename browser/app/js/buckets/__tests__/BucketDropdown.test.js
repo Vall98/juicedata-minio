@@ -15,43 +15,45 @@
  */
 
 import React from "react"
-import { shallow, mount } from "enzyme"
+import { render, screen, fireEvent } from "@testing-library/react"
 import { BucketDropdown } from "../BucketDropdown"
 
 describe("BucketDropdown", () => {
   it("should render without crashing", () => {
-    shallow(<BucketDropdown />)
+    render(<BucketDropdown />)
   })
 
   it("should call toggleDropdown on dropdown toggle", () => {
-    const wrapper = mount(<BucketDropdown />)
-    expect(wrapper.state("showBucketDropdown")).toBeFalsy()
-    wrapper.find("Dropdown").props().onToggle()
-    wrapper.update()
-    expect(wrapper.state("showBucketDropdown")).toBeTruthy()
+    const spy = jest.spyOn(BucketDropdown.prototype, "toggleDropdown")
+    render(<BucketDropdown />)
+    const toggle = screen.getByRole("button")
+    fireEvent.click(toggle)
+    expect(spy).toHaveBeenCalled()
+    spy.mockReset()
+    spy.mockRestore()
   })
 
   it("should call showBucketPolicy when Edit Policy link is clicked", () => {
     const showBucketPolicy = jest.fn()
-    const wrapper = shallow(
+    render(
       <BucketDropdown showBucketPolicy={showBucketPolicy} />
     )
-    wrapper
-      .find("li a")
-      .at(0)
-      .simulate("click", { stopPropagation: jest.fn() })
+    const toggle = screen.getByRole("button")
+    fireEvent.click(toggle)
+    const editPolicy = screen.getByText("Edit policy")
+    fireEvent.click(editPolicy)
     expect(showBucketPolicy).toHaveBeenCalled()
   })
 
   it("should call deleteBucket when Delete link is clicked", () => {
     const deleteBucket = jest.fn()
-    const wrapper = shallow(
+    render(
       <BucketDropdown bucket={"test"} deleteBucket={deleteBucket} />
     )
-    wrapper
-      .find("li a")
-      .at(1)
-      .simulate("click", { stopPropagation: jest.fn() })
+    const toggle = screen.getByRole("button")
+    fireEvent.click(toggle)
+    const deletePolicy = screen.getByText("Delete")
+    fireEvent.click(deletePolicy)
     expect(deleteBucket).toHaveBeenCalledWith("test")
   })
 })

@@ -15,11 +15,22 @@
  */
 
 import React from "react"
-import { shallow } from "enzyme"
+import { render } from "@testing-library/react"
+import { Provider } from "react-redux"
 import { ObjectsSection } from "../ObjectsSection"
+import configureStore from "../../store/configure-store"
 
 describe("ObjectsSection", () => {
+  let store
+  beforeEach(() => {
+    store = configureStore()
+  })
+
   it("should render without crashing", () => {
-    shallow(<ObjectsSection />)
+    render(
+      <Provider store={store}>
+        <ObjectsSection />
+      </Provider>
+    )
   })
 })

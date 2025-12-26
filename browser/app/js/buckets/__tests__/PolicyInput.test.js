@@ -15,9 +15,9 @@
  */
 
 import React from "react"
-import { shallow, mount } from "enzyme"
+import { render, screen, fireEvent, waitFor } from "@testing-library/react"
 import { PolicyInput } from "../PolicyInput"
-import { READ_ONLY, WRITE_ONLY, READ_WRITE } from "../../constants"
+import { READ_ONLY } from "../../constants"
 import web from "../../web"
 
 jest.mock("../../web", () => ({
@@ -29,27 +29,28 @@ jest.mock("../../web", () => ({
 describe("PolicyInput", () => {
   it("should render without crashing", () => {
     const fetchPolicies = jest.fn()
-    shallow(<PolicyInput currentBucket={"bucket"} fetchPolicies={fetchPolicies}/>)
+    render(<PolicyInput currentBucket={"bucket"} fetchPolicies={fetchPolicies} setPolicies={jest.fn()} showAlert={jest.fn()} />)
   })
 
   it("should call fetchPolicies after the component has mounted", () => {
     const fetchPolicies = jest.fn()
-    const wrapper = shallow(
-      <PolicyInput currentBucket={"bucket"} fetchPolicies={fetchPolicies} />
-    )
-    setImmediate(() => {
+    render(<PolicyInput currentBucket={"bucket"} fetchPolicies={fetchPolicies} setPolicies={jest.fn()} showAlert={jest.fn()} />)
+    return waitFor(() => {
       expect(fetchPolicies).toHaveBeenCalled()
     })
   })
 
   it("should call web.setBucketPolicy and fetchPolicies on submit", () => {
     const fetchPolicies = jest.fn()
-    const wrapper = shallow(
-      <PolicyInput currentBucket={"bucket"} policies={[]} fetchPolicies={fetchPolicies}/>
+    render(
+      <PolicyInput currentBucket={"bucket"} policies={[]} fetchPolicies={fetchPolicies} setPolicies={jest.fn()} showAlert={jest.fn()} />
     )
-    wrapper.instance().prefix = { value: "baz" }
-    wrapper.instance().policy = { value: READ_ONLY }
-    wrapper.find("button").simulate("click", { preventDefault: jest.fn() })
+    const prefixInput = screen.getByPlaceholderText("Prefix")
+    fireEvent.change(prefixInput, { target: { value: "baz" } })
+    const policySelect = screen.getByRole("combobox")
+    fireEvent.change(policySelect, { target: { value: READ_ONLY } })
+    const submitButton = screen.getByRole("button")
+    fireEvent.click(submitButton)
 
     expect(web.SetBucketPolicy).toHaveBeenCalledWith({
       bucketName: "bucket",
@@ -57,21 +58,22 @@ describe("PolicyInput", () => {
       policy: READ_ONLY
     })
 
-    setImmediate(() => {
+    return waitFor(() => {
       expect(fetchPolicies).toHaveBeenCalledWith("bucket")
     })
   })
 
   it("should change the prefix '*' to an empty string", () => {
     const fetchPolicies = jest.fn()
-    const wrapper = shallow(
-      <PolicyInput currentBucket={"bucket"} policies={[]} fetchPolicies={fetchPolicies}/>
+    render(
+      <PolicyInput currentBucket={"bucket"} policies={[]} fetchPolicies={fetchPolicies} setPolicies={jest.fn()} showAlert={jest.fn()} />
     )
-    wrapper.instance().prefix = { value: "*" }
-    wrapper.instance().policy = { value: READ_ONLY }
-
-    wrapper.find("button").simulate("click", { preventDefault: jest.fn() })
-
-    expect(wrapper.instance().prefix).toEqual({ value: "" })
+    const prefixInput = screen.getByPlaceholderText("Prefix")
+    fireEvent.change(prefixInput, { target: { value: "*" } })
+    const btn = screen.getByRole("button")
+    fireEvent.click(btn)
+    return waitFor(() => {
+      expect(prefixInput.value).toEqual("")
+    })
   })
 })

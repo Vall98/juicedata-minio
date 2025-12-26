@@ -15,22 +15,23 @@
  */
 
 import React from "react"
-import { shallow } from "enzyme"
+import { fireEvent, render, screen } from "@testing-library/react"
 import { MobileHeader } from "../MobileHeader"
 
 describe("Bucket", () => {
   it("should render without crashing", () => {
-    shallow(<MobileHeader sidebarOpen={false} />)
+    render(<MobileHeader sidebarOpen={false} />)
   })
 
   it("should toggleSidebar when trigger is clicked", () => {
     const toggleSidebar = jest.fn()
-    const wrapper = shallow(
+    render(
       <MobileHeader sidebarOpen={false} toggleSidebar={toggleSidebar} />
     )
-    wrapper
-      .find("#sidebar-toggle")
-      .simulate("click", { stopPropagation: jest.fn() })
+    const banner = screen.getByRole('banner')
+    const toggle = banner.querySelector("#sidebar-toggle")
+    expect(toggle).not.toBeNull()
+    fireEvent.click(toggle)
     expect(toggleSidebar).toHaveBeenCalled()
   })
 })

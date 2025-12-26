@@ -15,86 +15,94 @@
  */
 
 import React from "react"
-import { shallow } from "enzyme"
+import { render, screen, fireEvent, within } from "@testing-library/react"
 import { ObjectsBulkActions } from "../ObjectsBulkActions"
 
 describe("ObjectsBulkActions", () => {
   it("should render without crashing", () => {
-    shallow(<ObjectsBulkActions checkedObjects={[]} />)
+    render(<ObjectsBulkActions checkedObjects={[]} />)
   })
 
   it("should show actions when checkObjectsCount is more than 0", () => {
-    const wrapper = shallow(<ObjectsBulkActions checkedObjects={["test"]} />)
-    expect(wrapper.hasClass("list-actions-toggled")).toBeTruthy()
+    render(<ObjectsBulkActions checkedObjects={["test"]} />)
+    const btn = screen.getByRole("button", { name: "Download object" })
+    const root = btn.closest(".list-actions")
+    expect(root.classList.contains("list-actions-toggled")).toBeTruthy()
   })
 
   it("should call downloadObject when single object is selected and download button is clicked", () => {
     const downloadObject = jest.fn()
     const clearChecked = jest.fn()
-    const wrapper = shallow(
+    render(
       <ObjectsBulkActions
         checkedObjects={["test"]}
         downloadObject={downloadObject}
         clearChecked={clearChecked}
       />
     )
-    wrapper.find("#download-checked").simulate("click")
+    const btn = screen.getByRole("button", { name: "Download object" })
+    fireEvent.click(btn)
     expect(downloadObject).toHaveBeenCalled()
   })
 
   it("should call downloadChecked when a folder is selected and download button is clicked", () => {
     const downloadChecked = jest.fn()
-    const wrapper = shallow(
+    render(
       <ObjectsBulkActions
         checkedObjects={["test/"]}
         downloadChecked={downloadChecked}
       />
     )
-    wrapper.find("#download-checked").simulate("click")
+    const btn = screen.getByRole("button", { name: "Download all as zip" })
+    fireEvent.click(btn)
     expect(downloadChecked).toHaveBeenCalled()
   })
 
   it("should call downloadChecked when multiple objects are selected and download button is clicked", () => {
     const downloadChecked = jest.fn()
-    const wrapper = shallow(
+    render(
       <ObjectsBulkActions
         checkedObjects={["test1", "test2"]}
         downloadChecked={downloadChecked}
       />
     )
-    wrapper.find("#download-checked").simulate("click")
+    const btn = screen.getByRole("button", { name: "Download all as zip" })
+    fireEvent.click(btn)
     expect(downloadChecked).toHaveBeenCalled()
   })
 
   it("should call clearChecked when close button is clicked", () => {
     const clearChecked = jest.fn()
-    const wrapper = shallow(
+    render(
       <ObjectsBulkActions checkedObjects={["test"]} clearChecked={clearChecked} />
     )
-    wrapper.find("#close-bulk-actions").simulate("click")
+    const close = screen.getByLabelText("close objects actions")
+    fireEvent.click(close)
     expect(clearChecked).toHaveBeenCalled()
   })
 
   it("shoud show DeleteObjectConfirmModal when delete-checked button is clicked", () => {
-    const wrapper = shallow(<ObjectsBulkActions checkedObjects={["test"]} />)
-    wrapper.find("#delete-checked").simulate("click")
-    wrapper.update()
-    expect(wrapper.find("DeleteObjectConfirmModal").length).toBe(1)
+    render(<ObjectsBulkActions checkedObjects={["test"]} />)
+    expect(screen.queryByRole("dialog")).toBeNull()
+    const btn = screen.getByRole("button", { name: "Delete selected" })
+    fireEvent.click(btn)
+    expect(screen.getAllByRole("dialog")).not.toBeNull()
   })
 
   it("shoud call deleteChecked when Delete is clicked on confirmation modal", () => {
     const deleteChecked = jest.fn()
-    const wrapper = shallow(
+    render(
       <ObjectsBulkActions
         checkedObjects={["test"]}
         deleteChecked={deleteChecked}
       />
     )
-    wrapper.find("#delete-checked").simulate("click")
-    wrapper.update()
-    wrapper.find("DeleteObjectConfirmModal").prop("deleteObject")()
+    const btn = screen.getByRole("button", { name: "Delete selected" })
+    fireEvent.click(btn)
+    const dialog = screen.getAllByRole("dialog")[0]
+    const delBtn = within(dialog).getByRole("button", { name: "Delete" })
+    fireEvent.click(delBtn)
     expect(deleteChecked).toHaveBeenCalled()
-    wrapper.update()
-    expect(wrapper.find("DeleteObjectConfirmModal").length).toBe(0)
+    expect(screen.queryByRole("dialog")).toBeNull()
   })
 })

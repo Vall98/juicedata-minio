@@ -15,7 +15,7 @@
  */
 
 import React from "react"
-import { shallow } from "enzyme"
+import { fireEvent, render, screen } from "@testing-library/react"
 import { AboutModal } from "../AboutModal"
 
 describe("AboutModal", () => {
@@ -26,15 +26,16 @@ describe("AboutModal", () => {
   }
 
   it("should render without crashing", () => {
-    shallow(<AboutModal serverInfo={serverInfo} />)
+    render(<AboutModal serverInfo={serverInfo} />)
   })
 
   it("should call hideAbout when close button is clicked", () => {
     const hideAbout = jest.fn()
-    const wrapper = shallow(
+    render(
       <AboutModal serverInfo={serverInfo} hideAbout={hideAbout} />
     )
-    wrapper.find("button").simulate("click")
+    const btn = screen.getByRole("button")
+    fireEvent.click(btn)
     expect(hideAbout).toHaveBeenCalled()
   })
 })

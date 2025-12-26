@@ -53,7 +53,7 @@ export const MainActions = ({
         </Dropdown.Toggle>
         <Dropdown.Menu>
           <OverlayTrigger placement="left" overlay={uploadTooltip}>
-            <a href="#" className="feba-btn feba-upload">
+            <a href="#" className="feba-btn feba-upload" aria-label="upload file">
               <input
                 type="file"
                 onChange={onFileUpload}
@@ -77,6 +77,7 @@ export const MainActions = ({
                   e.preventDefault()
                   showMakeBucketModal()
                 }}
+                aria-label="create bucket"
               >
                 <i className="far fa-hdd" />
               </a>

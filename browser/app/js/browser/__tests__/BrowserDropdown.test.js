@@ -15,8 +15,20 @@
  */
 
 import React from "react"
-import { shallow } from "enzyme"
+import { fireEvent, render, screen } from "@testing-library/react"
 import { BrowserDropdown } from "../BrowserDropdown"
+import { Logout } from "../../web"
+import history from "../../history"
+
+jest.mock("../../web", () => ({
+  Logout: jest.fn(),
+}))
+
+jest.mock("../../history", () => {
+  return {
+    replace: jest.fn(),
+  }
+})
 
 describe("BrowserDropdown", () => {
   const serverInfo = {
@@ -26,14 +38,14 @@ describe("BrowserDropdown", () => {
   }
 
   it("should render without crashing", () => {
-    shallow(
+    render(
       <BrowserDropdown serverInfo={serverInfo} fetchServerInfo={jest.fn()} />
     )
   })
 
   it("should call fetchServerInfo after its mounted", () => {
     const fetchServerInfo = jest.fn()
-    const wrapper = shallow(
+    render(
       <BrowserDropdown
         serverInfo={serverInfo}
         fetchServerInfo={fetchServerInfo}
@@ -43,20 +55,26 @@ describe("BrowserDropdown", () => {
   })
 
   it("should show AboutModal when About link is clicked", () => {
-    const wrapper = shallow(
+    render(
       <BrowserDropdown serverInfo={serverInfo} fetchServerInfo={jest.fn()} />
     )
-    wrapper.find("#show-about").simulate("click", { preventDefault: jest.fn() })
-    wrapper.update()
-    expect(wrapper.state("showAboutModal")).toBeTruthy()
-    expect(wrapper.find("AboutModal").length).toBe(1)
+    const dropdownButton = screen.getByRole("button")
+    fireEvent.click(dropdownButton)
+    const about = screen.getByRole("link", { name: "About" })
+    fireEvent.click(about)
+    const modalContent = screen.getByRole("document");
+    expect(modalContent.textContent).toBe("×VersiontestPlatformtestRuntimetest");
   })
 
   it("should logout and redirect to /login when logout is clicked", () => {
-    const wrapper = shallow(
+    render(
       <BrowserDropdown serverInfo={serverInfo} fetchServerInfo={jest.fn()} />
     )
-    wrapper.find("#logout").simulate("click", { preventDefault: jest.fn() })
-    expect(window.location.pathname.endsWith("/login")).toBeTruthy()
+    const dropdownButton = screen.getByRole("button")
+    fireEvent.click(dropdownButton)
+    const logout = screen.getByRole("link", { name: "Logout" })
+    fireEvent.click(logout)
+    expect(Logout).toHaveBeenCalled()
+    expect(history.replace).toHaveBeenCalledWith("/login");
   })
 })

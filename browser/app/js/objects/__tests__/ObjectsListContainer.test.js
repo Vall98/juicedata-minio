@@ -15,35 +15,47 @@
  */
 
 import React from "react"
-import { shallow } from "enzyme"
+import { render, screen } from "@testing-library/react"
+import { Provider } from "react-redux"
 import { ObjectsListContainer } from "../ObjectsListContainer"
+import configureStore from "../../store/configure-store"
 
 describe("ObjectsList", () => {
+  let store
+  beforeEach(() => {
+    store = configureStore()
+  })
+
   it("should render without crashing", () => {
-    shallow(<ObjectsListContainer filteredObjects={[]} />)
+    render(
+      <Provider store={store}>
+        <ObjectsListContainer filteredObjects={[]} />
+      </Provider>
+    )
   })
 
   it("should render ObjectsList with objects", () => {
-    const wrapper = shallow(
-      <ObjectsListContainer
-        filteredObjects={[{ name: "test1.jpg" }, { name: "test2.jpg" }]}
-      />
+    render(
+      <Provider store={store}>
+        <ObjectsListContainer
+          filteredObjects={[{ name: "test1.jpg" }, { name: "test2.jpg" }]}
+        />
+      </Provider>
     )
-    expect(wrapper.find("ObjectsList").length).toBe(1)
-    expect(wrapper.find("ObjectsList").prop("objects")).toEqual([
-      { name: "test1.jpg" },
-      { name: "test2.jpg" }
-    ])
+    expect(screen.getByText("test1.jpg")).toBeTruthy()
+    expect(screen.getByText("test2.jpg")).toBeTruthy()
   })
 
   it("should show the loading indicator when the objects are being loaded", () => {
-    const wrapper = shallow(
-      <ObjectsListContainer
-        currentBucket="test1"
-        filteredObjects={[]}
-        listLoading={true}
-      />
+    render(
+      <Provider store={store}>
+        <ObjectsListContainer
+          currentBucket="test1"
+          filteredObjects={[]}
+          listLoading={true}
+        />
+      </Provider>
     )
-    expect(wrapper.find(".loading").exists()).toBeTruthy()
+    expect(screen.getByRole('status').classList.contains("loading")).toBeTruthy()
   })
 })

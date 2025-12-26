@@ -15,40 +15,76 @@
  */
 
 import React from "react"
-import { shallow } from "enzyme"
+import { render, screen, fireEvent, waitFor } from "@testing-library/react"
+import { Provider } from "react-redux"
 import { SideBar } from "../SideBar"
+import { LoggedIn } from "../../web"
+import configureStore from "../../store/configure-store"
 
 jest.mock("../../web", () => ({
-  LoggedIn: jest.fn(() => false).mockReturnValueOnce(true)
+  LoggedIn: jest.fn(() => false),
+  ListObjects: jest.fn(() => Promise.resolve({ objects: [], istruncated: false, prefixes: [] })),
+  ListBuckets: jest.fn(() => Promise.resolve({ buckets: [], istruncated: false, prefixes: [] }))
 }))
 
 describe("SideBar", () => {
+  let store
+  beforeEach(() => {
+    store = configureStore()
+  })
+
   it("should render without crashing", () => {
-    shallow(<SideBar />)
+    LoggedIn.mockReturnValue(true)
+    render(
+      <Provider store={store}>
+        <SideBar />
+      </Provider>
+    )
+    LoggedIn.mockReturnValue(false)
+  })
+
+  it("should render BucketSearch for LoggedIn users", () => {
+    LoggedIn.mockReturnValue(true)
+    render(
+      <Provider store={store}>
+        <SideBar />
+      </Provider>
+    )
+    const bucketSearchElements = screen.getByRole("textbox")
+    expect(bucketSearchElements).not.toBeNull()
+    LoggedIn.mockReturnValue(false)
   })
 
   it("should not render BucketSearch for non LoggedIn users", () => {
-    const wrapper = shallow(<SideBar />)
-    expect(wrapper.find("Connect(BucketSearch)").length).toBe(0)
+    render(
+      <Provider store={store}>
+        <SideBar />
+      </Provider>
+    )
+    const bucketSearchElements = screen.queryByRole("textbox")
+    expect(bucketSearchElements).toBeNull()
   })
 
   it("should call clickOutside when the user clicks outside the sidebar", () => {
     const clickOutside = jest.fn()
-    const wrapper = shallow(<SideBar clickOutside={clickOutside} />)
-    wrapper.simulate("clickOut", {
-      preventDefault: jest.fn(),
-      target: { classList: { contains: jest.fn(() => false) } }
-    })
+    render(
+      <Provider store={store}>
+        <SideBar clickOutside={clickOutside} />
+      </Provider>
+    )
+    fireEvent.mouseDown(document.body)
     expect(clickOutside).toHaveBeenCalled()
   })
 
   it("should not call clickOutside when user clicks on sidebar toggle", () => {
     const clickOutside = jest.fn()
-    const wrapper = shallow(<SideBar clickOutside={clickOutside} />)
-    wrapper.simulate("clickOut", {
-      preventDefault: jest.fn(),
-      target: { classList: { contains: jest.fn(() => true) } }
-    })
+    render(
+      <Provider store={store}>
+        <SideBar clickOutside={clickOutside} />
+      </Provider>
+    )
+    const toggle = screen.getByRole('heading')
+    fireEvent.click(toggle)
     expect(clickOutside).not.toHaveBeenCalled()
   })
 })
