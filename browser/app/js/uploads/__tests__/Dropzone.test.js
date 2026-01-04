@@ -16,6 +16,7 @@
 
 import React from "react"
 import { render } from "@testing-library/react"
+import * as ReactDropzone from "react-dropzone";
 import { Dropzone } from "../Dropzone"
 
 describe("Dropzone", () => {
@@ -25,11 +26,21 @@ describe("Dropzone", () => {
 
   it("should call uploadFile with files", () => {
     const uploadFile = jest.fn()
+    let onDropHandler
+    jest.spyOn(ReactDropzone, "useDropzone").mockImplementation(({ onDrop }) => {
+      onDropHandler = onDrop
+      return {
+        getRootProps: () => ({}),
+        getInputProps: () => ({}),
+        isDragActive: false,
+        isDragReject: false,
+      };
+    });
     render(<Dropzone uploadFile={uploadFile} />)
+    expect(onDropHandler).toBeDefined();
     const file1 = new File(["file content1"], "file1.txt", { type: "text/plain" })
     const file2 = new File(["file content2"], "file2.txt", { type: "text/plain" })
-    // call the onDrop handler directly to avoid complexities with jsdom/react-dropzone
-    Dropzone.prototype.onDrop.call({ props: { uploadFile } }, [file1, file2])
+    onDropHandler([file1, file2])
     expect(uploadFile).toHaveBeenCalledTimes(2)
     expect(uploadFile).toHaveBeenNthCalledWith(1, file1)
     expect(uploadFile).toHaveBeenNthCalledWith(2, file2)
